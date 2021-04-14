@@ -22,4 +22,4 @@ def reduce_noise(filepath, reduction_strength=0.5, volume=1.0):
     wavfile.write("audio_files/noise_reduce.wav", rate, reduced_noise.astype(np.dtype('i2')))
 
 # Example of using the noise reducer:
-reduce_noise("audio_files/output.wav")
+reduce_noise("audio_files/eng.wav")
