@@ -5,6 +5,9 @@ class GUI:
         pass
     
     def send_signal(self):
+        self.stm.send('record_button')
+
+    def receive_signal(self):
         self.stm.send('msg_received')
 
     def print_to_receiving(self): 
@@ -90,7 +93,7 @@ t7 = {
 t8 = {
     'source': 'sending',
     # possible two separate transitions as there are two triggers
-    'trigger': 'done; t',
+    'trigger': 'done',
     'target': 'idle',
     'effect': 'print_back_to_idle'}
 
@@ -151,4 +154,15 @@ driver.add_machine(machine)
 driver.start()
 
 # gui (buttons or some sort) to send correct signals (triggers)
-gui.send_signal()
+def main():
+    print("start this thing")
+    while True:
+        answer = input("what to do?: ")
+        if answer == "send":
+            gui.send_signal()
+        elif answer == "receive":
+            gui.receive_signal()
+        else:
+            print("fuck off")
+
+main()
