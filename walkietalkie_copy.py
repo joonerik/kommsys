@@ -20,15 +20,15 @@ class simple_gui:
         self.app.setFg('#121212', override=False)
 
         self.app.startLabelFrame('Home screen:')
-        self.app.addButton('Press Record message', None)
-        self.app.addButton('Press Emergency', None)
+        self.app.addButton('Press Record message', self.extract_button_name)
+        self.app.addButton('Press Emergency', self.extract_button_name)
         self.app.addLabelEntry("Type Channel", None)
-        self.app.addButton('Press Change channel', None)
+        self.app.addButton('Press Change channel', self.extract_button_name)
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Releasing buttons:')
-        self.app.addButton('Release record', None)
-        self.app.addButton('Release emergency', None)
+        self.app.addButton('Release record', self.extract_action)
+        self.app.addButton('Release emergency', self.extract_action)
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Display:')
