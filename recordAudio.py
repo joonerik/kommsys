@@ -29,6 +29,7 @@ class Recorder:
         self.recording = True
         while self.recording:
             data = stream.read(self.chunk)
+            print(type(data))
             self.frames.append(data)
         print("done recording")
         # Stop and close the stream 

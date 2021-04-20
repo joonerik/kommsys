@@ -7,7 +7,7 @@ import paho.mqtt.client as mqtt
 # MQTT settings
 broker = "mqtt.item.ntnu.no"
 port = 1883
-topic = '#'
+topic = 'awesometest'
 
 # Log config
 logging.basicConfig(format='%(asctime)s %(message)s',
@@ -18,15 +18,15 @@ logging.basicConfig(format='%(asctime)s %(message)s',
 # Message handler
 r = sr.Recognizer()
 def on_message(client, userdata, msg):
-    # TODO Check if a .wav file was received
+    print
 
-    message = sr.AudioFile(msg)
+    # message = sr.AudioFile(msg)
 
-    with message as source:
-        audio = r.record(source)
+    # with message as source:
+    #     audio = r.record(source)
 
-    interpretation = r.recognize_google(audio)
-    logging.info('{}: {}'.format(client, interpretation))
+    # interpretation = r.recognize_google(audio)
+    # logging.info('{}: {}'.format(client, interpretation))
 
 # MQTT setup
 client = mqtt.Client()
