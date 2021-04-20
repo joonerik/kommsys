@@ -1,11 +1,16 @@
-from stmpy import Machine, Driver
+import stmpy
+from appJar import gui
+
+stm_driver = stmpy.Driver()
+stm_driver.start(keep_active=True)
 
 class GUI:
-    def __init__(self):
-        pass
     
-    def send_signal(self):
+    def record_signal(self):
         self.stm.send('record_button')
+
+    def record_emg_signal(self):
+        self.stm.send('emg_mes_button')
 
     def receive_signal(self):
         self.stm.send('msg_received')
@@ -31,7 +36,28 @@ class GUI:
     def print_do(self):
         print("this is a do")
 
-gui = GUI()
+    def create_gui(self):
+        self.app = gui()
+
+        self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
+        self.app.addButton('Record message', self.record_signal)
+        self.app.addButton('Emergency', self.record_emg_signal)
+        self.app.addLabelEntry("Type Channel", None)
+        self.app.addButton('Change channel', None)
+        self.app.stopLabelFrame()
+
+        self.app.startLabelFrame('Releasing buttons:')
+        self.app.addButton('Release record', None)
+        self.app.addButton('Release emergency', None)
+        self.app.stopLabelFrame()
+
+        self.app.startLabelFrame('Display:')
+        self.app.addLabel('Current Channel: 1', None)
+        self.app.addLabel('Current Status: Listening', None)
+        self.app.addLabel('Current Volume: 15', None)
+        self.app.stopLabelFrame()
+
+        self.app.go()
 
 # start
 t0 = {'source': 'initial',
@@ -93,6 +119,7 @@ t7 = {
 t8 = {
     'source': 'sending',
     # possible two separate transitions as there are two triggers
+    # missing t!
     'trigger': 'done',
     'target': 'idle',
     'effect': 'print_back_to_idle'}
@@ -115,7 +142,8 @@ t10 = {
 t11 = {
     'source': 'sending_emg_msg',
     # possible two separate transitions as there are two triggers
-    'trigger': 'done; t',
+    # missing t!
+    'trigger': 'done',
     'target': 'idle',
     'effect': 'print_back_to_idle'}
 
@@ -143,15 +171,19 @@ sending_emg_msg = {'name': 'sending_emg_msg',
                     'do': 'print_do'}
 
 
-machine = Machine(name='gui', 
+gui_wt = GUI()
+
+machine = stmpy.Machine(name='gui_wt', 
                 transitions=[t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11], 
                 states=[idle, sending, receiving, receiving_emg_msg, sending_emg_msg],
-                obj=gui) 
-gui.stm = machine
+                obj=gui_wt) 
+gui_wt.stm = machine
 
-driver = Driver()
+driver = stmpy.Driver()
 driver.add_machine(machine)
 driver.start()
+
+gui_wt.create_gui()
 
 # gui (buttons or some sort) to send correct signals (triggers)
 def main():
@@ -165,4 +197,4 @@ def main():
         else:
             print("fuck off")
 
-main()
+# main()
