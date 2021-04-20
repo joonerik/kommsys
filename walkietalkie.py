@@ -1,18 +1,5 @@
 from stmpy import Machine, Driver
 
-class WalkieTalkie:
-    def __init__(self):
-        pass
-
-    def print(self): 
-        print("this is a function triggered from a transition effect")
-
-    def print_state(self):
-        print("this is a function triggered from the state")
-
-    def create_machine(self):
-        print("fuck")
-
 class GUI:
     def __init__(self):
         pass
@@ -20,38 +7,44 @@ class GUI:
     def send_signal(self):
         self.stm.send('msg_received')
 
-    def print(self): 
-        print("this is a function triggered from a transitiosefdsan effect")
+    def print_to_receiving(self): 
+        print("transition: idle to receiving, trigger: msg_received")
 
-    def print_state(self):
-        print("this is a function triggered from the state")
+    def print_to_sending(self): 
+        print("transition: idle to sending, trigger: record_button")
 
-    def print_test(self):
-        print("this is from the do")
+    def print_back_to_idle(self):
+        print("back to idle state")
 
-    def print_done(self):
-        print("this is after done going back to idle")
+    def print_to_receiving_emg_msg(self):
+        print("going to receiving_emg_msg state")
+        
+    def print_to_sending_emg_msg(self):
+        print("going to sending_emg_msg state")
     
+    def print_start_machine(self):
+        print("start machine")
+
 gui = GUI()
 
 # start
 t0 = {'source': 'initial',
     'target': 'idle',
-    'effect': ''}
+    'effect': 'print_start_machine'}
 
 # idle to receiving by receiving message
 t1 = {
     'source': 'idle',
     'target': 'receiving',
     'trigger': 'msg_received',
-    'effect': 'print'}
+    'effect': 'print_to_receiving'}
 
 # idle to sending by button
 t2 = {
     'source': 'idle',
     'trigger': 'record_button',
     'target': 'sending',
-    'effect': 'print'}
+    'effect': 'print_to_sending'}
 
 # idle to sending_emg_msg by button
 t3 = {
@@ -60,35 +53,35 @@ t3 = {
     # the two buttons pressed simultanously
     'trigger': 'emg_mes_button',
     'target': 'sending_emg_msg',
-    'effect': 'print'}
+    'effect': 'print_to_sending_emg_msg'}
 
 # idle to receiving_emg_msg by trigger by trigger emg_msg_received
 t4 = {
     'source': 'idle',
     'trigger': 'emg_mes_received',
     'target': 'receiving_emg_msg',
-    'effect': 'print'}
+    'effect': 'print_to_receiving_emg_msg'}
 
 # receiving_emg_msg to idle by trigger done
 t5 = {
     'source': 'receiving_emg_msg',
     'trigger': 'done',
     'target': 'idle',
-    'effect': 'print'}
+    'effect': 'print_back_to_idle'}
 
 # receiving to receiving_emg_msg by trigger emg_msg_received
 t6 = {
     'source': 'receiving',
     'trigger': 'emg_msg_received',
     'target': 'receiving_emg_msg',
-    'effect': 'print'}
+    'effect': 'print_to_receiving_emg_msg'}
 
 # sending to receiving_emg_msg by trigger emg_msg_received
 t7 = {
     'source': 'sending',
     'trigger': 'emg_msg_received',
     'target': 'receiving_emg_msg',
-    'effect': 'print'}
+    'effect': 'print_to_receiving_emg_msg'}
 
 # sending to idle by trigger done or timer
 t8 = {
@@ -96,29 +89,29 @@ t8 = {
     # possible two separate transitions as there are two triggers
     'trigger': 'done; t',
     'target': 'idle',
-    'effect': 'print'}
+    'effect': 'print_back_to_idle'}
 
 # receiving to idle by trigger done
 t9 = {
     'source': 'receiving',
     'trigger': 'done',
     'target': 'idle',
-    'effect': 'print_done'}
+    'effect': 'print_back_to_idle'}
 
 # receiving to sending_emg_msg by trigger emg_mes_button
 t10 = {
     'source': 'receiving',
     'trigger': 'emg_mes_button',
     'target': 'sending_emg_msg',
-    'effect': 'print'}
-    
+    'effect': 'print_to_sending_emg_msg'}
+
 # sending_emg_msg to idle by trigger done or timer
 t11 = {
     'source': 'sending_emg_msg',
     # possible two separate transitions as there are two triggers
     'trigger': 'done; t',
     'target': 'idle',
-    'effect': 'print'}
+    'effect': 'print_back_to_idle'}
 
 
 idle = {'name': 'idle',
@@ -153,4 +146,6 @@ gui.stm = machine
 driver = Driver()
 driver.add_machine(machine)
 driver.start()
+
+# gui (buttons or some sort) to send correct signals (triggers)
 gui.send_signal()
