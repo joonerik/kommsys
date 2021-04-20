@@ -1,11 +1,16 @@
 import stmpy
 from appJar import gui
+# from recordAudio import Recorder 
+import time
+from record_logic import Recorder
+
 
 stm_driver = stmpy.Driver()
 stm_driver.start(keep_active=True)
 
+
+
 class GUI:
-    
     def record_signal(self):
         self.stm.send('record_button')
 
@@ -21,6 +26,13 @@ class GUI:
     def print_to_sending(self): 
         print("transition: idle to sending, trigger: record_button")
 
+    def recording(self):
+        driver.send('start', 'stm')
+
+    def stop_recording(self):
+        driver.send('stop', 'stm')
+
+   
     def print_back_to_idle(self):
         print("back to idle state")
 
@@ -47,7 +59,7 @@ class GUI:
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Releasing buttons:')
-        self.app.addButton('Release record', None)
+        self.app.addButton('Release record', self.stop_recording)
         self.app.addButton('Release emergency', None)
         self.app.stopLabelFrame()
 
@@ -155,7 +167,8 @@ idle = {'name': 'idle',
 sending = {'name': 'sending',
             'entry': 'start_timer("t", 30000)',
             # do: publish()
-            'do': 'print_do'}
+            # 'do': 'print_do',
+            'do': 'recording'}
 
 receiving = {'name': 'receiving',
             # do: play()
@@ -172,29 +185,19 @@ sending_emg_msg = {'name': 'sending_emg_msg',
 
 
 gui_wt = GUI()
+recorder = Recorder()
 
 machine = stmpy.Machine(name='gui_wt', 
                 transitions=[t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11], 
                 states=[idle, sending, receiving, receiving_emg_msg, sending_emg_msg],
                 obj=gui_wt) 
 gui_wt.stm = machine
+        
+
 
 driver = stmpy.Driver()
 driver.add_machine(machine)
+driver.add_machine(recorder.create_machine('stm'))
 driver.start()
 
 gui_wt.create_gui()
-
-# gui (buttons or some sort) to send correct signals (triggers)
-def main():
-    print("start this thing")
-    while True:
-        answer = input("what to do?: ")
-        if answer == "send":
-            gui.send_signal()
-        elif answer == "receive":
-            gui.receive_signal()
-        else:
-            print("fuck off")
-
-# main()
