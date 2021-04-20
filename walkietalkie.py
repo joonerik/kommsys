@@ -25,6 +25,9 @@ class GUI:
     def print_start_machine(self):
         print("start machine")
 
+    def print_do(self):
+        print("this is a do")
+
 gui = GUI()
 
 # start
@@ -121,20 +124,20 @@ idle = {'name': 'idle',
 sending = {'name': 'sending',
             'entry': 'start_timer("t", 30000)',
             # do: publish()
-            'do': 'print_state()'}
+            'do': 'print_do'}
 
 receiving = {'name': 'receiving',
             # do: play()
-            'do': 'print_test()'}
+            'do': 'print_do'}
 
 receiving_emg_msg = {'name': 'receiving_emg_msg',
                     # do: play() - possible other function
-                    'do': 'print_state()'}
+                    'do': 'print_do'}
 
 sending_emg_msg = {'name': 'sending_emg_msg',
                     'entry': 'start_timer("t", 30000)',
                     #'do': 'publish()'
-                    'do': 'print_state()'}
+                    'do': 'print_do'}
 
 
 machine = Machine(name='gui', 
