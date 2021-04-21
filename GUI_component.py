@@ -18,6 +18,12 @@ class GUI:
 
     def play_msg_signal(self):
         self.stm.driver.send('start', 'playback_stm')
+
+    def change_channel(self):
+        self.stm.send('change_channel')
+    
+    def A(self):
+        print("internal transition")
    
     def print_back_to_idle(self):
         print("back to idle state")
@@ -45,7 +51,7 @@ class GUI:
         self.app.addButton('Emergency', None)
         self.app.addButton('Play message', self.play_msg_signal)
         self.app.addLabelEntry("Type Channel", None)
-        self.app.addButton('Change channel', None)
+        self.app.addButton('Change channel', self.change_channel)
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Releasing buttons:')
@@ -160,8 +166,14 @@ class GUI:
             'target': 'idle',
             'effect': 'print_timer'}
 
-        idle = {'name': 'idle',
-                # TODO: internal transition
+        # internal transition in idle
+        t13 = {
+            'source': 'idle',
+            'trigger': 'change_channel',
+            'target': 'idle',
+            'effect': 'A'}
+
+        idle = {'name': 'idle'
                 }
 
         sending = {'name': 'sending',
