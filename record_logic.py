@@ -54,10 +54,11 @@ class Recorder:
         t1 = {'trigger': 'start', 'source': 'ready', 'target': 'recording'}
         t2 = {'trigger': 'done', 'source': 'recording', 'target': 'processing'}
         t3 = {'trigger': 'done', 'source': 'processing', 'target': 'ready'}
+        t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready'}
 
-        s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()"}
+        s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()", 'entry': 'start_timer("t", 3000)'}
         s_processing = {'name': 'processing', 'do': 'process()'}
 
-        stm = stmpy.Machine(name=name, transitions=[t0, t1, t2, t3], states=[s_recording, s_processing], obj=self)
+        stm = stmpy.Machine(name=name, transitions=[t0, t1, t2, t3, t4], states=[s_recording, s_processing], obj=self)
         self.stm = stm
         return self.stm

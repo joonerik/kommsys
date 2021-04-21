@@ -3,22 +3,14 @@ from appJar import gui
 import time
 
 class GUI:
-    def record_signal(self):
-        self.stm.send('record_button')
-
-    def record_emg_signal(self):
-        self.stm.send('emg_mes_button')
-
-    def receive_signal(self):
-        self.stm.send('msg_received')
-
     def print_to_receiving(self): 
         print("transition: idle to receiving, trigger: msg_received")
 
     def print_to_sending(self): 
-        print("transition: idle to sending, trigger: record_button")
+        print("transition: idle to sending, trigger: start in recorder_stm")
 
     def recording(self):
+        self.print_to_sending()
         self.stm.driver.send('start', 'recorder_stm')
 
     def stop_recording(self):
@@ -42,12 +34,15 @@ class GUI:
     def print_do(self):
         print("this is a do")
 
+    def print_timer(self):
+        print("timer expired, going to idle state")
+
     def create_gui(self):
         self.app = gui()
 
         self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
-        self.app.addButton('Record message', self.record_signal)
-        self.app.addButton('Emergency', self.record_emg_signal)
+        self.app.addButton('Record message', self.recording)
+        self.app.addButton('Emergency', None)
         self.app.addButton('Play message', self.play_msg_signal)
         self.app.addLabelEntry("Type Channel", None)
         self.app.addButton('Change channel', None)
@@ -84,7 +79,7 @@ class GUI:
             'source': 'idle',
             'trigger': 'record_button',
             'target': 'sending',
-            'effect': 'print_to_sending'}
+            'effect': 'print_to_sending; recording'}
 
         # idle to sending_emg_msg by button
         t3 = {
@@ -123,11 +118,9 @@ class GUI:
             'target': 'receiving_emg_msg',
             'effect': 'print_to_receiving_emg_msg'}
 
-        # sending to idle by trigger done or timer
+        # sending to idle by trigger done
         t8 = {
             'source': 'sending',
-            # possible two separate transitions as there are two triggers
-            # missing t!
             'trigger': 'done',
             'target': 'idle',
             'effect': 'print_back_to_idle'}
@@ -146,22 +139,33 @@ class GUI:
             'target': 'sending_emg_msg',
             'effect': 'print_to_sending_emg_msg'}
 
-        # sending_emg_msg to idle by trigger done or timer
+        # sending_emg_msg to idle by trigger done
         t11 = {
             'source': 'sending_emg_msg',
-            # possible two separate transitions as there are two triggers
-            # missing t!
             'trigger': 'done',
             'target': 'idle',
             'effect': 'print_back_to_idle'}
 
+        # sending to idle by trigger timer
+        t12 = {
+            'source': 'sending',
+            'trigger': 't',
+            'target': 'idle',
+            'effect': 'print_timer'}
+
+        # sending_emg_msg to idle by trigger done or timer
+        t13 = {
+            'source': 'sending_emg_msg',
+            'trigger': 't',
+            'target': 'idle',
+            'effect': 'print_timer'}
 
         idle = {'name': 'idle',
                 # TODO: internal transition
                 }
 
         sending = {'name': 'sending',
-                    'entry': 'start_timer("t", 30000)',
+                    'entry': 'start_timer("t", 3000)',
                     # do: publish()
                     # 'do': 'print_do',
                     'do': 'recording'}
@@ -180,7 +184,7 @@ class GUI:
                             'do': 'print_do'}
 
         stm = stmpy.Machine(name=name, 
-                transitions=[t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11], 
+                transitions=[t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13], 
                 states=[idle, sending, receiving, receiving_emg_msg, sending_emg_msg],
                 obj=self) 
         self.stm = stm
