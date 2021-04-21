@@ -24,6 +24,8 @@ class GUI:
     def stop_recording(self):
         self.stm.driver.send('stop', 'stm')
 
+    def play_msg_signal(self):
+        self.stm.driver.send('start', 'playback')
    
     def print_back_to_idle(self):
         print("back to idle state")
@@ -46,6 +48,7 @@ class GUI:
         self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
         self.app.addButton('Record message', self.record_signal)
         self.app.addButton('Emergency', self.record_emg_signal)
+        self.app.addButton('Play message', self.play_msg_signal)
         self.app.addLabelEntry("Type Channel", None)
         self.app.addButton('Change channel', None)
         self.app.stopLabelFrame()
