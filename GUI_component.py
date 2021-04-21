@@ -19,13 +19,13 @@ class GUI:
         print("transition: idle to sending, trigger: record_button")
 
     def recording(self):
-        self.stm.driver.send('start', 'stm')
+        self.stm.driver.send('start', 'recorder_stm')
 
     def stop_recording(self):
-        self.stm.driver.send('stop', 'stm')
+        self.stm.driver.send('stop', 'recorder_stm')
 
     def play_msg_signal(self):
-        self.stm.driver.send('start', 'playback')
+        self.stm.driver.send('start', 'playback_stm')
    
     def print_back_to_idle(self):
         print("back to idle state")

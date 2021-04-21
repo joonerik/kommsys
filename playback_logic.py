@@ -1,8 +1,6 @@
 from stmpy import Machine, Driver
 from os import system
 import os
-import time
-
 import pyaudio
 import wave
 
