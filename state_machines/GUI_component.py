@@ -24,7 +24,17 @@ class GUI:
     
     def A(self):
         print("internal transition")
-   
+
+    def receive_emg_msg(self):
+        print("'A emg msg was received!'")
+        self.stm.driver.send('emg_msg', 'recorder_stm')
+        # self.stm.driver.send('emg_msg', 'playback_stm')
+
+    def finish_emg_msg(self):
+        print("'The emg msg is done playing!'")
+        self.stm.driver.send('emg_msg', 'recorder_stm')
+        # self.stm.driver.send('emg_msg', 'playback_stm')
+    
     def print_back_to_idle(self):
         print("back to idle state")
 
@@ -57,6 +67,8 @@ class GUI:
         self.app.startLabelFrame('Releasing buttons:')
         self.app.addButton('Release record', self.stop_recording)
         self.app.addButton('Release emergency', None)
+        self.app.addButton('Emergency msg received', self.receive_emg_msg)
+        self.app.addButton('Emergency msg finished', self.finish_emg_msg)
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Display:')

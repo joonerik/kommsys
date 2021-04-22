@@ -19,6 +19,7 @@ class Player:
         self.client.connect(broker, port)
         self.client.subscribe(channel)
         self.filename = 'audio_files/output_audio/output.wav'
+        self.emg_mode = False
 
         try:
             thread = Thread(target=self.client.loop_forever)
@@ -35,41 +36,50 @@ class Player:
         f.close()
         
     def play(self):
-        # Set chunk size of 1024 samples per data frame
-        chunk = 1024  
+        if not self.emg_mode:
+            # Set chunk size of 1024 samples per data frame
+            chunk = 1024  
 
-        # Open the sound file 
-        wf = wave.open(self.filename, 'rb')
+            # Open the sound file 
+            wf = wave.open(self.filename, 'rb')
 
-        # Create an interface to PortAudio
-        p = pyaudio.PyAudio()
+            # Create an interface to PortAudio
+            p = pyaudio.PyAudio()
 
-        # Open a .Stream object to write the WAV file to
-        # 'output = True' indicates that the sound will be played rather than recorded
-        stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
-                        channels = wf.getnchannels(),
-                        rate = wf.getframerate(),
-                        output = True)
+            # Open a .Stream object to write the WAV file to
+            # 'output = True' indicates that the sound will be played rather than recorded
+            stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
+                            channels = wf.getnchannels(),
+                            rate = wf.getframerate(),
+                            output = True)
 
-        # Read data in chunks
-        data = wf.readframes(chunk)
-
-        # Play the sound by writing the audio data to the stream
-        while data != '':
-            stream.write(data)
+            # Read data in chunks
             data = wf.readframes(chunk)
 
-        # Close and terminate the stream
-        stream.close()
-        p.terminate()
+            # Play the sound by writing the audio data to the stream
+            while data != '':
+                stream.write(data)
+                data = wf.readframes(chunk)
+
+            # Close and terminate the stream
+            stream.close()
+            p.terminate()
+
+    def switch_emg_mode(self):
+        print("before " + str(self.emg_mode))
+        self.emg_mode = not self.emg_mode
+        print("after " + str(self.emg_mode))
 
     def create_machine(self, name):
         t0 = {'source': 'initial', 'target': 'ready'}
         t1 = {'trigger': 'start', 'source': 'ready', 'target': 'playing'}
         t2 = {'trigger': 'done', 'source': 'playing', 'target': 'ready'}
-
+        t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
+        t6 = {'trigger': 'emg_msg', 'source': 'playing', 'target': 'ready', 'effect': 'switch_emg_mode'}
+        
         s_playing = {'name': 'playing', 'do': 'play()'}
 
-        stm = Machine(name=name, transitions=[t0, t1, t2], states=[s_playing], obj=self)
+
+        stm = Machine(name=name, transitions=[t0, t1, t2, t5, t6], states=[s_playing], obj=self)
         self.stm = stm
         return self.stm
