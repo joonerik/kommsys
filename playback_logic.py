@@ -1,3 +1,9 @@
+from threading import Thread
+
+import paho.mqtt.client as mqtt
+broker, port = "mqtt.item.ntnu.no", 1883
+channel = "team13"
+
 from stmpy import Machine, Driver
 from os import system
 import os
@@ -7,16 +13,33 @@ import wave
         
 class Player:
     def __init__(self):
-        pass
+        self.client = mqtt.Client()
+        self.client.on_message = self.on_message
+        self.client.connect(broker, port)
+        self.client.subscribe(channel)
+        self.filename = 'audio_files/output_audio/output.wav'
+
+        try:
+            thread = Thread(target=self.client.loop_forever)
+            thread.start()
+        except KeyboardInterrupt:
+            print("Interrupted")
+            self.client.disconnect()
+
+    def on_message(self, client, userdata, msg):
+        print("on_message(): topic: {}".format(msg.topic))
+
+        f = open(self.filename, 'wb')
+        f.write(msg.payload)
+        f.close()
+    
         
     def play(self):
-        filename = 'audio_files/output.wav'
-
         # Set chunk size of 1024 samples per data frame
         chunk = 1024  
 
         # Open the sound file 
-        wf = wave.open(filename, 'rb')
+        wf = wave.open(self.filename, 'rb')
 
         # Create an interface to PortAudio
         p = pyaudio.PyAudio()
