@@ -12,10 +12,11 @@ class Recorder:
         self.sample_format = pyaudio.paInt16  # 16 bits per sample
         self.channels = 1
         self.fs = 44100  # Record at 44100 samples per second
-        self.filename = str(uuid.uuid4()) + ".wav"
+        self.filename = "input_audio/" + str(uuid.uuid4()) + ".wav"
         self.p = pyaudio.PyAudio() 
         
     def record(self):
+        self.p = pyaudio.PyAudio() 
         stream = self.p.open(format=self.sample_format,
                 channels=self.channels,
                 rate=self.fs,
@@ -55,7 +56,7 @@ class Recorder:
         t2 = {'trigger': 'done', 'source': 'recording', 'target': 'processing'}
         t3 = {'trigger': 'done', 'source': 'processing', 'target': 'ready'}
         t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready'}
-
+        
         s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()", 'entry': 'start_timer("t", 30000)'}
         s_processing = {'name': 'processing', 'do': 'process()'}
 
