@@ -10,6 +10,7 @@ import os
 import pyaudio
 import wave
 
+from utils.reduceNoise import reduce_noise
         
 class Player:
     def __init__(self):
@@ -32,7 +33,6 @@ class Player:
         f = open(self.filename, 'wb')
         f.write(msg.payload)
         f.close()
-    
         
     def play(self):
         # Set chunk size of 1024 samples per data frame
