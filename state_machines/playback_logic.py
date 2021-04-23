@@ -2,7 +2,7 @@ from threading import Thread
 
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
-channel = "team13"
+channel = "23456/team13"
 
 from stmpy import Machine, Driver
 from os import system
@@ -10,8 +10,7 @@ import os
 import pyaudio
 import wave
 
-from utils.reduceNoise import reduce_noise
-        
+
 class Player:
     def __init__(self):
         self.client = mqtt.Client()
@@ -56,10 +55,13 @@ class Player:
             # Read data in chunks
             data = wf.readframes(chunk)
 
+            
+
             # Play the sound by writing the audio data to the stream
-            while data != '':
+            while data != (b''):
                 stream.write(data)
                 data = wf.readframes(chunk)
+                print(data)
 
             # Close and terminate the stream
             stream.close()

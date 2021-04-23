@@ -1,7 +1,7 @@
 
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
-channel = "team13"
+channel = "23456/team13"
 
 import stmpy
 from os import system
@@ -38,7 +38,6 @@ class Recorder:
             self.recording = True
             while self.recording:
                 data = stream.read(self.chunk)
-                # print(type(data))
                 self.frames.append(data)
             print("done recording")
             # Stop and close the stream 
