@@ -23,7 +23,7 @@ class GUI:
 
     def change_channel(self, channel):
 
-        # newChannel = open("audio_files/channel.txt", "w")
+        newChannel = open("audio_files/channel.txt", "w")
         newChannel.write(channel)
 
         self.stm.send('change_channel')
@@ -35,7 +35,7 @@ class GUI:
     def receive_emg_msg(self):
         print("'A emg msg was received!'")
         self.stm.driver.send('emg_msg', 'recorder_stm')
-        self.app.setImage("show", "/img/rsos.png")
+        self.app.setImage("show", "img/rsos.png")
         self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
 
@@ -141,12 +141,12 @@ class GUI:
         #self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
         #self.app.addButton('Record message', self.recording)
         #self.app.addButton('Emergency', None)
-        self.app.addButton('Play message', self.play_msg_signal)
-        self.app.addLabelEntry("Channel", None)
-        self.app.addButton('Change channel', self.change_channel)
         # self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Releasing buttons:', 0,1)
+        self.app.addButton('Play message', self.play_msg_signal)
+        self.app.addLabelEntry("Channel", None)
+        self.app.addButton('Change channel', self.change_channel)
         self.app.addButton('Release record', self.stop_recording)
         self.app.addButton('Release emergency', None)
         self.app.addButton('Emergency msg received', self.receive_emg_msg)
