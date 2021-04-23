@@ -1,14 +1,13 @@
 import stmpy
 from appJar import gui
 import time
-import fileinput
 
-class GUI:
 
+class GUI2:
     def print_to_receiving(self):
         print("transition: idle to receiving, trigger: msg_received")
 
-    def print_to_sending(self): 
+    def print_to_sending(self):
         print("transition: idle to sending, trigger: start in recorder_stm")
 
     def recording(self):
@@ -22,13 +21,8 @@ class GUI:
         self.stm.driver.send('start', 'playback_stm')
 
     def change_channel(self):
-
-        newChannel = open("audio_files/channel.txt", "w")
-        newChannel.write(self.app.getEntry("Channel"))
-
         self.stm.send('change_channel')
-        self.stm.driver.send('change_channel_signal', 'playback_stm')
-    
+
     def A(self):
         print("internal transition")
 
@@ -45,16 +39,16 @@ class GUI:
         self.app.setImage('show', "/Users/cecilie/team13_walkietalkie/img/idle2.png")
         self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
-    
+
     def print_back_to_idle(self):
         print("back to idle state")
 
     def print_to_receiving_emg_msg(self):
         print("going to receiving_emg_msg state")
-        
+
     def print_to_sending_emg_msg(self):
         print("going to sending_emg_msg state")
-    
+
     def print_start_machine(self):
         print("start machine")
 
@@ -73,7 +67,7 @@ class GUI:
             "SOS": [79, 496, 178, 533],
             "channel": [54, 155, 104, 191],
             "volume": [126, 170, 226, 292],
-            "1": [83,565,138,594],
+            "1": [83, 565, 138, 594],
             "2": [158, 565, 224, 594],
             "3": [241, 565, 301, 594],
             "4": [83, 609, 138, 637],
@@ -92,7 +86,7 @@ class GUI:
         self.app.addLabel("l1", "<click on the device>")
         self.app.addLabel("channel", "" + str(50) + "")
 
-    def click(self,area):
+    def click(self, area):
         self.app.setLabel("l1", area)
         if area == "SOS":
             self.stm.driver.send('emg_msg', 'recorder_stm')
@@ -101,7 +95,7 @@ class GUI:
             print("sending emergency message")
         if area == "Record":
             self.recording()
-            #self.stm.driver.send('start', 'recorder_stm')
+            # self.stm.driver.send('start', 'recorder_stm')
             self.app.setImage("show", "/Users/cecilie/team13_walkietalkie/img/recording.png")
             self.app.setImageMap("show", self.click, self.coords)
             print("sending message")
@@ -130,41 +124,38 @@ class GUI:
                 self.change_channel()
                 self.a = ""
 
-
-
     def create_gui(self):
 
         self.app.setFont(14)
 
-
-        #self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
-        #self.app.addButton('Record message', self.recording)
-        #self.app.addButton('Emergency', None)
+        # self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
+        # self.app.addButton('Record message', self.recording)
+        # self.app.addButton('Emergency', None)
         self.app.addButton('Play message', self.play_msg_signal)
-        self.app.addLabelEntry("Channel", None)
-        self.app.addButton('Change channel', self.change_channel)
-        self.app.stopLabelFrame()
+        # self.app.addLabelEntry("Type Channel", None)
+        # self.app.addButton('Change channel', self.change_channel)
+        # self.app.stopLabelFrame()
 
-        self.app.startLabelFrame('Releasing buttons:', 0,1)
+        self.app.startLabelFrame('Releasing buttons:', 0, 1)
         self.app.addButton('Release record', self.stop_recording)
         self.app.addButton('Release emergency', None)
         self.app.addButton('Emergency msg received', self.receive_emg_msg)
         self.app.addButton('Emergency msg finished', self.finish_emg_msg)
         self.app.stopLabelFrame()
 
-        self.app.startLabelFrame('Display:',0,2)
+        self.app.startLabelFrame('Display:', 0, 2)
         self.app.addLabel("channelnow", "Current channel: " + "1")
-        #self.app.addLabel('Current Status: Listening', None)
-        #self.app.addLabel('Current Volume: 15', None)
+        # self.app.addLabel('Current Status: Listening', None)
+        # self.app.addLabel('Current Volume: 15', None)
         self.app.stopLabelFrame()
 
         self.app.go()
 
-    def create_machine(self, name): 
+    def create_machine(self, name):
         # start
         t0 = {'source': 'initial',
-            'target': 'idle',
-            'effect': 'print_start_machine'}
+              'target': 'idle',
+              'effect': 'print_start_machine'}
 
         # idle to receiving by receiving message
         t1 = {
@@ -270,27 +261,27 @@ class GUI:
                 }
 
         sending = {'name': 'sending',
-                    'entry': 'start_timer("t", 3000)',
-                    # do: publish()
-                    # 'do': 'print_do',
-                    'do': 'recording'}
+                   'entry': 'start_timer("t", 3000)',
+                   # do: publish()
+                   # 'do': 'print_do',
+                   'do': 'recording'}
 
         receiving = {'name': 'receiving',
-                    # do: play()
-                    'do': 'print_do'}
+                     # do: play()
+                     'do': 'print_do'}
 
         receiving_emg_msg = {'name': 'receiving_emg_msg',
-                            # do: play() - possible other function
-                            'do': 'print_do'}
+                             # do: play() - possible other function
+                             'do': 'print_do'}
 
         sending_emg_msg = {'name': 'sending_emg_msg',
-                            'entry': 'start_timer("t", 30000)',
-                            #'do': 'publish()'
-                            'do': 'print_do'}
+                           'entry': 'start_timer("t", 30000)',
+                           # 'do': 'publish()'
+                           'do': 'print_do'}
 
-        stm = stmpy.Machine(name=name, 
-                transitions=[t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13], 
-                states=[idle, sending, receiving, receiving_emg_msg, sending_emg_msg],
-                obj=self) 
+        stm = stmpy.Machine(name=name,
+                            transitions=[t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13],
+                            states=[idle, sending, receiving, receiving_emg_msg, sending_emg_msg],
+                            obj=self)
         self.stm = stm
         return self.stm
