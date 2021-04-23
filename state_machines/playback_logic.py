@@ -2,7 +2,11 @@ from threading import Thread
 
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
-channel = "team13"
+
+newChannel = open("/Users/carlaxellind/Documents/Studie/NTNU/Sjette semester/Design av kommuniserende systemer/team13_walkietalkie/audio_files/channel.txt", "r")
+channel = newChannel.readline()
+
+#channel = "team13"
 
 from stmpy import Machine, Driver
 from os import system
@@ -30,9 +34,9 @@ class Player:
 
     def on_message(self, client, userdata, msg):
         print("on_message(): topic: {}".format(msg.topic))
-
+        channel = msg.payload["channel"]
         f = open(self.filename, 'wb')
-        f.write(msg.payload)
+        f.write(msg.payload["data"])
         f.close()
         
     def play(self):
