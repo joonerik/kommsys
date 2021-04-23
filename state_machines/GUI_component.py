@@ -1,8 +1,10 @@
 import stmpy
 from appJar import gui
 import time
+import fileinput
 
 class GUI:
+
     def print_to_receiving(self): 
         print("transition: idle to receiving, trigger: msg_received")
 
@@ -20,6 +22,10 @@ class GUI:
         self.stm.driver.send('start', 'playback_stm')
 
     def change_channel(self):
+
+        newChannel = open("/Users/carlaxellind/Documents/Studie/NTNU/Sjette semester/Design av kommuniserende systemer/team13_walkietalkie/audio_files/channel.txt", "w")
+        newChannel.write(self.app.getEntry("Channel"))
+        
         self.stm.send('change_channel')
     
     def A(self):
@@ -60,7 +66,7 @@ class GUI:
         self.app.addButton('Record message', self.recording)
         self.app.addButton('Emergency', None)
         self.app.addButton('Play message', self.play_msg_signal)
-        self.app.addLabelEntry("Type Channel", None)
+        self.app.addLabelEntry("Channel", None)
         self.app.addButton('Change channel', self.change_channel)
         self.app.stopLabelFrame()
 
