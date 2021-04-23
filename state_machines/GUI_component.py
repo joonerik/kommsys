@@ -27,6 +27,7 @@ class GUI:
         newChannel.write(self.app.getEntry("Channel"))
         
         self.stm.send('change_channel')
+        self.stm.driver.send('change_channel_signal', 'playback_stm')
     
     def A(self):
         print("internal transition")

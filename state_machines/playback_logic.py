@@ -3,8 +3,6 @@ from threading import Thread
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
 
-newChannel = open("audio_files/channel.txt", "r")
-channel = newChannel.readline()
 
 #channel = "team13"
 
@@ -21,7 +19,8 @@ class Player:
         self.client = mqtt.Client()
         self.client.on_message = self.on_message
         self.client.connect(broker, port)
-        self.client.subscribe(channel)
+        self.channel = open("audio_files/channel.txt", "r").readline()
+        self.client.subscribe(self.channel)
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
 
@@ -75,16 +74,22 @@ class Player:
         self.emg_mode = not self.emg_mode
         print("after " + str(self.emg_mode))
 
+    def change_channel(self):
+        self.client.unsubscribe(self.channel)
+        self.channel = open("audio_files/channel.txt", "r").readline()
+        self.client.subscribe(self.channel)
+
     def create_machine(self, name):
         t0 = {'source': 'initial', 'target': 'ready'}
         t1 = {'trigger': 'start', 'source': 'ready', 'target': 'playing'}
         t2 = {'trigger': 'done', 'source': 'playing', 'target': 'ready'}
         t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
         t6 = {'trigger': 'emg_msg', 'source': 'playing', 'target': 'ready', 'effect': 'switch_emg_mode'}
+        t7 = {'trigger': 'change_channel_signal', 'source': 'ready', 'target': 'ready', 'effect': 'change_channel'}
         
         s_playing = {'name': 'playing', 'do': 'play()'}
 
 
-        stm = Machine(name=name, transitions=[t0, t1, t2, t5, t6], states=[s_playing], obj=self)
+        stm = Machine(name=name, transitions=[t0, t1, t2, t5, t6, t7], states=[s_playing], obj=self)
         self.stm = stm
         return self.stm
