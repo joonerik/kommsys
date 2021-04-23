@@ -2,7 +2,7 @@ from threading import Thread
 
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
-channel = "team13"
+channel = "team13_2"
 
 from stmpy import Machine, Driver
 from os import system
@@ -30,6 +30,7 @@ class Player:
 
     def on_message(self, client, userdata, msg):
         print("on_message(): topic: {}".format(msg.topic))
+        
 
         f = open(self.filename, 'wb')
         f.write(msg.payload)
@@ -55,13 +56,13 @@ class Player:
 
             # Read data in chunks
             data = wf.readframes(chunk)
-
             # Play the sound by writing the audio data to the stream
-            while data != '':
+            while data != (b''):
                 stream.write(data)
                 data = wf.readframes(chunk)
 
             # Close and terminate the stream
+            print("play msg finished")
             stream.close()
             p.terminate()
 

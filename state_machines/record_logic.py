@@ -1,7 +1,7 @@
 
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
-channel = "team13"
+channel = "team13_2"
 from threading import Thread
 import stmpy
 from os import system
