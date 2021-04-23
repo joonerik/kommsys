@@ -35,14 +35,14 @@ class GUI:
     def receive_emg_msg(self):
         print("'A emg msg was received!'")
         self.stm.driver.send('emg_msg', 'recorder_stm')
-        self.app.setImage("show", "/Users/cecilie/team13_walkietalkie/img/rsos.png")
+        self.app.setImage("show", "/img/rsos.png")
         self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
 
     def finish_emg_msg(self):
         print("'The emg msg is done playing!'")
         self.stm.driver.send('emg_msg', 'recorder_stm')
-        self.app.setImage('show', "/Users/cecilie/team13_walkietalkie/img/idle2.png")
+        self.app.setImage('show', "img/idle2.png")
         self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
     
@@ -86,7 +86,7 @@ class GUI:
             "+": [83, 702, 138, 726],
             "done": [241, 702, 301, 726]
         }
-        self.app.addImage("show", "/Users/cecilie/team13_walkietalkie/img/idle.png", 0, 0)
+        self.app.addImage("show", "img/idle.png", 0, 0)
         self.app.setImageMap("show", self.click, self.coords)
 
         self.app.addLabel("l1", "<click on the device>")
@@ -96,21 +96,21 @@ class GUI:
         self.app.setLabel("l1", area)
         if area == "SOS":
             self.stm.driver.send('emg_msg', 'recorder_stm')
-            self.app.setImage("show", "/Users/cecilie/team13_walkietalkie/img/ssos.png")
+            self.app.setImage("show", "img/ssos.png")
             self.app.setImageMap("show", self.click, self.coords)
             print("sending emergency message")
         if area == "Record":
             self.recording()
             #self.stm.driver.send('start', 'recorder_stm')
-            self.app.setImage("show", "/Users/cecilie/team13_walkietalkie/img/recording.png")
+            self.app.setImage("show", "img/recording.png")
             self.app.setImageMap("show", self.click, self.coords)
             print("sending message")
         if area == "channel":
-            self.app.setImage("show", "/Users/cecilie/Desktop/ntnu/Frame 2.png")
+            # self.app.setImage("show", "/Users/cecilie/Desktop/ntnu/Frame 2.png")
             self.app.setImageMap("show", self.click, self.coords)
             print("channel changed")
         if area == None:
-            self.app.setImage('show', "/Users/cecilie/team13_walkietalkie/img/idle2.png")
+            self.app.setImage('show', "img/idle2.png")
             self.app.setImageMap("show", self.click, self.coords)
         """for k in ["0","1","2","3","4","5","6","7","8","9"]:
             if area == k:
@@ -143,7 +143,7 @@ class GUI:
         self.app.addButton('Play message', self.play_msg_signal)
         self.app.addLabelEntry("Channel", None)
         self.app.addButton('Change channel', self.change_channel)
-        self.app.stopLabelFrame()
+        # self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Releasing buttons:', 0,1)
         self.app.addButton('Release record', self.stop_recording)
