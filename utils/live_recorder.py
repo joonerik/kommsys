@@ -33,7 +33,7 @@ class LiveRecorder:
             data = stream.read(self.chunk)
             ba_data = bytearray(data) # necessary?
             # Publish
-            self.mqtt_client.publish(topic, "hi")
+            self.mqtt_client.publish(topic, ba_data)
         
         # Stop and close the stream
         stream.stop_stream()
@@ -52,7 +52,7 @@ client = mqtt.Client()
 client.connect(broker, port)
 
 recorder = LiveRecorder(client)
-recorder.record('awesometest')
+recorder.record('team13')
 
 # s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()"}
 
