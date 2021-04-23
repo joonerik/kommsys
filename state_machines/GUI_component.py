@@ -21,10 +21,10 @@ class GUI:
     def play_msg_signal(self):
         self.stm.driver.send('start', 'playback_stm')
 
-    def change_channel(self):
+    def change_channel(self, channel):
 
-        newChannel = open("audio_files/channel.txt", "w")
-        newChannel.write(self.app.getEntry("Channel"))
+        # newChannel = open("audio_files/channel.txt", "w")
+        newChannel.write(channel)
 
         self.stm.send('change_channel')
         self.stm.driver.send('change_channel_signal', 'playback_stm')
@@ -127,7 +127,8 @@ class GUI:
             if area == "done":
                 self.channelEdit = False
                 self.app.setLabel("channelnow", "Current channel: " + self.a)
-                self.change_channel()
+                self.change_channel(self.a)
+                # self.change_channel()
                 self.a = ""
 
 
