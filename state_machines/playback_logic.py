@@ -30,11 +30,12 @@ class Player:
 
     def on_message(self, client, userdata, msg):
         print("on_message(): topic: {}".format(msg.topic))
-        
-
+    
         f = open(self.filename, 'wb')
         f.write(msg.payload)
         f.close()
+
+        reduce_noise(self.filename, reduction_strength=0.5)
         
     def play(self):
         if not self.emg_mode:
