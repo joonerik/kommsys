@@ -267,5 +267,6 @@ Thumbs.db
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,pycharm
 
-# ignore audio files
+# ignore audio files and txt
+/audio_files
 *.wav
