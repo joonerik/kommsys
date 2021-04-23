@@ -2,8 +2,19 @@ import stmpy
 from appJar import gui
 import time
 import fileinput
+from state_machines.record_logic import Recorder
+from state_machines.playback_logic import Player
 
 class GUI:
+
+    def create_driver(self):
+        recorder = Recorder()
+        playback = Player()
+
+        self.driver = stmpy.Driver()
+        self.driver.add_machine(recorder.create_machine('recorder_stm'))
+        self.driver.add_machine(playback.create_machine('playback_stm'))
+        self.driver.start()
 
     def print_to_receiving(self):
         print("transition: idle to receiving, trigger: msg_received")
@@ -13,35 +24,34 @@ class GUI:
 
     def recording(self):
         self.print_to_sending()
-        self.stm.driver.send('start', 'recorder_stm')
+        self.driver.send('start', 'recorder_stm')
 
     def stop_recording(self):
-        self.stm.driver.send('stop', 'recorder_stm')
+        self.driver.send('stop', 'recorder_stm')
 
     def play_msg_signal(self):
-        self.stm.driver.send('start', 'playback_stm')
+        self.driver.send('start', 'playback_stm')
 
     def change_channel(self, channel):
 
         newChannel = open("audio_files/channel.txt", "w")
         newChannel.write(channel)
 
-        self.stm.send('change_channel')
-        self.stm.driver.send('change_channel_signal', 'playback_stm')
+        self.driver.send('change_channel_signal', 'playback_stm')
     
     def A(self):
         print("internal transition")
 
     def receive_emg_msg(self):
         print("'A emg msg was received!'")
-        self.stm.driver.send('emg_msg', 'recorder_stm')
+        self.driver.send('emg_msg', 'recorder_stm')
         self.app.setImage("show", "img/rsos.png")
         self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
 
     def finish_emg_msg(self):
         print("'The emg msg is done playing!'")
-        self.stm.driver.send('emg_msg', 'recorder_stm')
+        self.driver.send('emg_msg', 'recorder_stm')
         self.app.setImage('show', "img/idle2.png")
         self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
@@ -92,10 +102,14 @@ class GUI:
         self.app.addLabel("l1", "<click on the device>")
         self.app.addLabel("channel", "" + str(50) + "")
 
+        self.driver = stmpy.Driver()
+        self.driver.start(keep_active=True)
+        self.create_driver()
+
     def click(self,area):
         self.app.setLabel("l1", area)
         if area == "SOS":
-            self.stm.driver.send('emg_msg', 'recorder_stm')
+            self.driver.send('emg_msg', 'recorder_stm')
             self.app.setImage("show", "img/ssos.png")
             self.app.setImageMap("show", self.click, self.coords)
             print("sending emergency message")
@@ -161,137 +175,5 @@ class GUI:
 
         self.app.go()
 
-    def create_machine(self, name): 
-        # start
-        t0 = {'source': 'initial',
-            'target': 'idle',
-            'effect': 'print_start_machine'}
-
-        # idle to receiving by receiving message
-        t1 = {
-            'source': 'idle',
-            'target': 'receiving',
-            'trigger': 'msg_received',
-            'effect': 'print_to_receiving'}
-
-        # idle to sending by button
-        t2 = {
-            'source': 'idle',
-            'trigger': 'record_button',
-            'target': 'sending',
-            'effect': 'print_to_sending; recording'}
-
-        # idle to sending_emg_msg by button
-        t3 = {
-            'source': 'idle',
-            # remember that this trigger represents a function which handles
-            # the two buttons pressed simultanously
-            'trigger': 'emg_mes_button',
-            'target': 'sending_emg_msg',
-            'effect': 'print_to_sending_emg_msg'}
-
-        # idle to receiving_emg_msg by trigger by trigger emg_msg_received
-        t4 = {
-            'source': 'idle',
-            'trigger': 'emg_mes_received',
-            'target': 'receiving_emg_msg',
-            'effect': 'print_to_receiving_emg_msg'}
-
-        # receiving_emg_msg to idle by trigger done
-        t5 = {
-            'source': 'receiving_emg_msg',
-            'trigger': 'done',
-            'target': 'idle',
-            'effect': 'print_back_to_idle'}
-
-        # receiving to receiving_emg_msg by trigger emg_msg_received
-        t6 = {
-            'source': 'receiving',
-            'trigger': 'emg_msg_received',
-            'target': 'receiving_emg_msg',
-            'effect': 'print_to_receiving_emg_msg'}
-
-        # sending to receiving_emg_msg by trigger emg_msg_received
-        t7 = {
-            'source': 'sending',
-            'trigger': 'emg_msg_received',
-            'target': 'receiving_emg_msg',
-            'effect': 'print_to_receiving_emg_msg'}
-
-        # sending to idle by trigger done
-        t8 = {
-            'source': 'sending',
-            'trigger': 'done',
-            'target': 'idle',
-            'effect': 'print_back_to_idle'}
-
-        # receiving to idle by trigger done
-        t9 = {
-            'source': 'receiving',
-            'trigger': 'done',
-            'target': 'idle',
-            'effect': 'print_back_to_idle'}
-
-        # receiving to sending_emg_msg by trigger emg_mes_button
-        t10 = {
-            'source': 'receiving',
-            'trigger': 'emg_mes_button',
-            'target': 'sending_emg_msg',
-            'effect': 'print_to_sending_emg_msg'}
-
-        # sending_emg_msg to idle by trigger done
-        t11 = {
-            'source': 'sending_emg_msg',
-            'trigger': 'done',
-            'target': 'idle',
-            'effect': 'print_back_to_idle'}
-
-        # sending to idle by trigger timer
-        t12 = {
-            'source': 'sending',
-            'trigger': 't',
-            'target': 'idle',
-            'effect': 'print_timer'}
-
-        # sending_emg_msg to idle by trigger done or timer
-        t13 = {
-            'source': 'sending_emg_msg',
-            'trigger': 't',
-            'target': 'idle',
-            'effect': 'print_timer'}
-
-        # internal transition in idle
-        t13 = {
-            'source': 'idle',
-            'trigger': 'change_channel',
-            'target': 'idle',
-            'effect': 'A'}
-
-        idle = {'name': 'idle'
-                }
-
-        sending = {'name': 'sending',
-                    'entry': 'start_timer("t", 3000)',
-                    # do: publish()
-                    # 'do': 'print_do',
-                    'do': 'recording'}
-
-        receiving = {'name': 'receiving',
-                    # do: play()
-                    'do': 'print_do'}
-
-        receiving_emg_msg = {'name': 'receiving_emg_msg',
-                            # do: play() - possible other function
-                            'do': 'print_do'}
-
-        sending_emg_msg = {'name': 'sending_emg_msg',
-                            'entry': 'start_timer("t", 30000)',
-                            #'do': 'publish()'
-                            'do': 'print_do'}
-
-        stm = stmpy.Machine(name=name, 
-                transitions=[t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13], 
-                states=[idle, sending, receiving, receiving_emg_msg, sending_emg_msg],
-                obj=self) 
-        self.stm = stm
-        return self.stm
+gui_wt = GUI()
+gui_wt.create_gui()
