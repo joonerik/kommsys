@@ -2,7 +2,7 @@ from threading import Thread
 
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
-channel = "team13_2"
+channel = "team13"
 
 from stmpy import Machine, Driver
 from os import system
@@ -35,7 +35,7 @@ class Player:
         f.write(msg.payload)
         f.close()
 
-        reduce_noise(self.filename, reduction_strength=0.5)
+        reduce_noise(self.filename)
         
     def play(self):
         if not self.emg_mode:
