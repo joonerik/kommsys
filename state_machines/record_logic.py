@@ -2,7 +2,7 @@
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
 channel = "team13"
-
+from threading import Thread
 import stmpy
 from os import system
 import os
@@ -12,9 +12,7 @@ import uuid
 
 class Recorder:
     def __init__(self):
-        self.client = mqtt.Client()
-        self.client.connect(broker, port)
-
+        self.start(broker, port)
         self.recording = False
         self.emg_mode = False
         self.chunk = 1024  # Record in chunks of 1024 samples
@@ -23,6 +21,22 @@ class Recorder:
         self.fs = 44100  # Record at 44100 samples per second
         self.filename = "audio_files/input_audio/" + str(uuid.uuid4()) + ".wav"
         self.p = pyaudio.PyAudio()
+
+    def start(self, broker, port):
+        self.client = mqtt.Client()
+        self.client.on_connect = self.on_connect
+        print("Connecting to {}:{}".format(broker, port))
+        self.client.connect(broker, port)
+        
+        try:
+            thread = Thread(target=self.client.loop_forever)
+            thread.start()
+        except KeyboardInterrupt:
+            print("Interrupted")
+            self.client.disconnect()
+
+    def on_connect(self, client, userdata, flags, rc):
+        print("on_connect(): {}".format(mqtt.connack_string(rc)))
         
     def record(self):
         print(self.emg_mode)
@@ -60,12 +74,12 @@ class Recorder:
         wf.setframerate(self.fs)
         wf.writeframes(b''.join(self.frames))
         wf.close()
-
+        
         f = open(self.filename, "rb")
         imagestring = f.read()
         f.close()
         byteArray = bytearray(imagestring)
-        
+
         # Send message over mqtt
         self.client.publish(channel, byteArray)
 
