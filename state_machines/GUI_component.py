@@ -28,11 +28,15 @@ class GUI:
     def receive_emg_msg(self):
         print("'A emg msg was received!'")
         self.stm.driver.send('emg_msg', 'recorder_stm')
+        self.app.setImage("show", "/Users/cecilie/team13_walkietalkie/img/rsos.png")
+        self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
 
     def finish_emg_msg(self):
         print("'The emg msg is done playing!'")
         self.stm.driver.send('emg_msg', 'recorder_stm')
+        self.app.setImage('show', "/Users/cecilie/team13_walkietalkie/img/idle2.png")
+        self.app.setImageMap("show", self.click, self.coords)
         # self.stm.driver.send('emg_msg', 'playback_stm')
     
     def print_back_to_idle(self):
@@ -55,11 +59,25 @@ class GUI:
 
     def __init__(self):
         self.app = gui()
+        self.a = ""
+        self.channelEdit = False
         self.coords = {
             "Record": [76, 404, 188, 483],
             "SOS": [79, 496, 178, 533],
             "channel": [54, 155, 104, 191],
             "volume": [126, 170, 226, 292],
+            "1": [83,565,138,594],
+            "2": [158, 565, 224, 594],
+            "3": [241, 565, 301, 594],
+            "4": [83, 609, 138, 637],
+            "5": [158, 609, 224, 637],
+            "6": [241, 609, 301, 637],
+            "7": [83, 652, 138, 684],
+            "8": [158, 652, 224, 684],
+            "9": [241, 652, 301, 684],
+            "0": [158, 702, 224, 726],
+            "+": [83, 702, 138, 726],
+            "done": [241, 702, 301, 726]
         }
         self.app.addImage("show", "/Users/cecilie/team13_walkietalkie/img/idle.png", 0, 0)
         self.app.setImageMap("show", self.click, self.coords)
@@ -87,6 +105,23 @@ class GUI:
         if area == None:
             self.app.setImage('show', "/Users/cecilie/team13_walkietalkie/img/idle2.png")
             self.app.setImageMap("show", self.click, self.coords)
+        """for k in ["0","1","2","3","4","5","6","7","8","9"]:
+            if area == k:
+                self.a = area
+                self.app.setLabel("channelnow", "Channel: " + self.a)
+                self.change_channel()
+                break"""
+        if area == "+":
+            self.channelEdit = True
+        k = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        if self.channelEdit:
+            if area in k:
+                self.a += area
+            if area == "done":
+                self.channelEdit = False
+                self.app.setLabel("channelnow", "Current channel: " + self.a)
+                self.change_channel()
+                self.a = ""
 
 
 
@@ -105,15 +140,15 @@ class GUI:
 
         self.app.startLabelFrame('Releasing buttons:', 0,1)
         self.app.addButton('Release record', self.stop_recording)
-        #self.app.addButton('Release emergency', None)
-        #self.app.addButton('Emergency msg received', self.receive_emg_msg)
-        #self.app.addButton('Emergency msg finished', self.finish_emg_msg)
+        self.app.addButton('Release emergency', None)
+        self.app.addButton('Emergency msg received', self.receive_emg_msg)
+        self.app.addButton('Emergency msg finished', self.finish_emg_msg)
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Display:',0,2)
-        self.app.addLabel('Current Channel: 1', None)
-        self.app.addLabel('Current Status: Listening', None)
-        self.app.addLabel('Current Volume: 15', None)
+        self.app.addLabel("channelnow", "Current channel: " + "1")
+        #self.app.addLabel('Current Status: Listening', None)
+        #self.app.addLabel('Current Volume: 15', None)
         self.app.stopLabelFrame()
 
         self.app.go()
