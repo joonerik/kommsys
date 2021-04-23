@@ -56,7 +56,7 @@ class GUI2:
     def create_gui(self):
         self.app = gui("Walkie Talkie", "430x825")
         self.app.setFont(14)
-        self.app.addImage("show", "/img/idle.png", 0, 0)
+        self.app.addImage("show", "team13_walkietalkie/img/idle.png", 0, 0)
 
 
         self.app.startLabelFrame('Starting walkie talkie/ Home screen:')

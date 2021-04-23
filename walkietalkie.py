@@ -7,7 +7,7 @@ from state_machines.playback_logic import Player
 stm_driver = stmpy.Driver()
 stm_driver.start(keep_active=True)
 
-gui_wt = GUI2()
+gui_wt = GUI()
 recorder = Recorder()
 playback = Player()
 

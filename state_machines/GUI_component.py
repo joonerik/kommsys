@@ -53,25 +53,64 @@ class GUI:
     def print_timer(self):
         print("timer expired, going to idle state")
 
-    def create_gui(self):
+    def __init__(self):
         self.app = gui()
+        self.coords = {
+            "Record": [76, 404, 188, 483],
+            "SOS": [79, 496, 178, 533],
+            "channel": [54, 155, 104, 191],
+            "volume": [126, 170, 226, 292],
+        }
+        self.app.addImage("show", "/Users/cecilie/team13_walkietalkie/img/idle.png", 0, 0)
+        self.app.setImageMap("show", self.click, self.coords)
 
-        self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
-        self.app.addButton('Record message', self.recording)
-        self.app.addButton('Emergency', None)
+        self.app.addLabel("l1", "<click on the device>")
+        self.app.addLabel("channel", "" + str(50) + "")
+
+    def click(self,area):
+        self.app.setLabel("l1", area)
+        if area == "SOS":
+            self.stm.driver.send('emg_msg', 'recorder_stm')
+            self.app.setImage("show", "/Users/cecilie/team13_walkietalkie/img/ssos.png")
+            self.app.setImageMap("show", self.click, self.coords)
+            print("sending emergency message")
+        if area == "Record":
+            self.recording()
+            #self.stm.driver.send('start', 'recorder_stm')
+            self.app.setImage("show", "/Users/cecilie/team13_walkietalkie/img/recording.png")
+            self.app.setImageMap("show", self.click, self.coords)
+            print("sending message")
+        if area == "channel":
+            self.app.setImage("show", "/Users/cecilie/Desktop/ntnu/Frame 2.png")
+            self.app.setImageMap("show", self.click, self.coords)
+            print("channel changed")
+        if area == None:
+            self.app.setImage('show', "/Users/cecilie/team13_walkietalkie/img/idle2.png")
+            self.app.setImageMap("show", self.click, self.coords)
+
+
+
+    def create_gui(self):
+
+        self.app.setFont(14)
+
+
+        #self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
+        #self.app.addButton('Record message', self.recording)
+        #self.app.addButton('Emergency', None)
         self.app.addButton('Play message', self.play_msg_signal)
-        self.app.addLabelEntry("Type Channel", None)
-        self.app.addButton('Change channel', self.change_channel)
-        self.app.stopLabelFrame()
+        #self.app.addLabelEntry("Type Channel", None)
+        #self.app.addButton('Change channel', self.change_channel)
+        #self.app.stopLabelFrame()
 
-        self.app.startLabelFrame('Releasing buttons:')
+        self.app.startLabelFrame('Releasing buttons:', 0,1)
         self.app.addButton('Release record', self.stop_recording)
-        self.app.addButton('Release emergency', None)
-        self.app.addButton('Emergency msg received', self.receive_emg_msg)
-        self.app.addButton('Emergency msg finished', self.finish_emg_msg)
+        #self.app.addButton('Release emergency', None)
+        #self.app.addButton('Emergency msg received', self.receive_emg_msg)
+        #self.app.addButton('Emergency msg finished', self.finish_emg_msg)
         self.app.stopLabelFrame()
 
-        self.app.startLabelFrame('Display:')
+        self.app.startLabelFrame('Display:',0,2)
         self.app.addLabel('Current Channel: 1', None)
         self.app.addLabel('Current Status: Listening', None)
         self.app.addLabel('Current Volume: 15', None)
