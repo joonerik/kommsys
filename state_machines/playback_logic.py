@@ -38,6 +38,7 @@ class Player:
         f.close()
 
         reduce_noise(self.filename)
+        self.stm.send("start")
         
     def play(self):
         if not self.emg_mode:
