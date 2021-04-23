@@ -2,7 +2,7 @@ import stmpy
 from appJar import gui
 import time
 
-class GUI:
+class GUI2:
     def print_to_receiving(self): 
         print("transition: idle to receiving, trigger: msg_received")
 
@@ -54,7 +54,10 @@ class GUI:
         print("timer expired, going to idle state")
 
     def create_gui(self):
-        self.app = gui()
+        self.app = gui("Walkie Talkie", "430x825")
+        self.app.setFont(14)
+        self.app.addImage("show", "/img/idle.png", 0, 0)
+
 
         self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
         self.app.addButton('Record message', self.recording)

@@ -1,12 +1,13 @@
 import stmpy
 from state_machines.GUI_component import GUI
+from state_machines.GUI_component2 import GUI2
 from state_machines.record_logic import Recorder
 from state_machines.playback_logic import Player
 
 stm_driver = stmpy.Driver()
 stm_driver.start(keep_active=True)
 
-gui_wt = GUI()
+gui_wt = GUI2()
 recorder = Recorder()
 playback = Player()
 
