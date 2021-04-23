@@ -69,7 +69,7 @@ class Recorder:
     def process(self):
         print("processing")
 
-        newChannel = open("/Users/carlaxellind/Documents/Studie/NTNU/Sjette semester/Design av kommuniserende systemer/team13_walkietalkie/audio_files/channel.txt", "r")
+        newChannel = open("audio_files/channel.txt", "r")
         channel = newChannel.readline()
 
         # Save the recorded data as a WAV file
@@ -85,10 +85,9 @@ class Recorder:
         f.close()
 
         byteArray = bytearray(imagestring)
-        message = {"channel": channel, "data": byteArray}   
 
         # Send message over mqtt
-        self.client.publish(channel, message)
+        self.client.publish(channel, byteArray)
 
     def switch_emg_mode(self):
         print("before " + str(self.emg_mode))

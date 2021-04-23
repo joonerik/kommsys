@@ -23,7 +23,7 @@ class GUI:
 
     def change_channel(self):
 
-        newChannel = open("/Users/carlaxellind/Documents/Studie/NTNU/Sjette semester/Design av kommuniserende systemer/team13_walkietalkie/audio_files/channel.txt", "w")
+        newChannel = open("audio_files/channel.txt", "w")
         newChannel.write(self.app.getEntry("Channel"))
         
         self.stm.send('change_channel')
