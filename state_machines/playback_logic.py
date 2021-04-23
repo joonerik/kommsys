@@ -38,6 +38,8 @@ class Player:
         f = open(self.filename, 'wb')
         f.write(msg.payload["data"])
         f.close()
+
+        reduce_noise(self.filename)
         
     def play(self):
         if not self.emg_mode:
@@ -59,13 +61,13 @@ class Player:
 
             # Read data in chunks
             data = wf.readframes(chunk)
-
             # Play the sound by writing the audio data to the stream
-            while data != '':
+            while data != (b''):
                 stream.write(data)
                 data = wf.readframes(chunk)
 
             # Close and terminate the stream
+            print("play msg finished")
             stream.close()
             p.terminate()
 
