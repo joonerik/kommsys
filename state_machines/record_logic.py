@@ -1,7 +1,8 @@
 
 import paho.mqtt.client as mqtt
 broker, port = "mqtt.item.ntnu.no", 1883
-channel = "team13"
+
+#channel="team13"
 from threading import Thread
 import stmpy
 from os import system
@@ -67,6 +68,10 @@ class Recorder:
     
     def process(self):
         print("processing")
+
+        newChannel = open("audio_files/channel.txt", "r")
+        channel = newChannel.readline()
+
         # Save the recorded data as a WAV file
         wf = wave.open(self.filename, 'wb')
         wf.setnchannels(self.channels)
@@ -78,6 +83,7 @@ class Recorder:
         f = open(self.filename, "rb")
         imagestring = f.read()
         f.close()
+
         byteArray = bytearray(imagestring)
 
         # Send message over mqtt
