@@ -1,18 +1,13 @@
 from threading import Thread
-
-import paho.mqtt.client as mqtt
-broker, port = "mqtt.item.ntnu.no", 1883
-
-
-#channel = "team13"
-
 from stmpy import Machine, Driver
 from os import system
+from utils.reduceNoise import reduce_noise
+import paho.mqtt.client as mqtt
 import os
 import pyaudio
 import wave
 
-from utils.reduceNoise import reduce_noise
+broker, port = "mqtt.item.ntnu.no", 1883
         
 class Player:
     def __init__(self):
@@ -21,6 +16,7 @@ class Player:
         self.client.connect(broker, port)
         self.channel = open("audio_files/channel.txt", "r").readline()
         self.client.subscribe(self.channel)
+        self.client.subscribe("emg")
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
 
@@ -69,6 +65,8 @@ class Player:
             print("Message is finished")
             stream.close()
             p.terminate()
+        else:
+            print("Emergency mode ON - can't play incoming message")
 
     def switch_emg_mode(self):
         print("before " + str(self.emg_mode))

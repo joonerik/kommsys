@@ -1,15 +1,13 @@
-
-import paho.mqtt.client as mqtt
-broker, port = "mqtt.item.ntnu.no", 1883
-
-#channel="team13"
 from threading import Thread
-import stmpy
 from os import system
+import paho.mqtt.client as mqtt
+import stmpy
 import os
 import pyaudio
 import wave
 import uuid
+
+broker, port = "mqtt.item.ntnu.no", 1883
 
 class Recorder:
     def __init__(self):
@@ -59,6 +57,8 @@ class Recorder:
             stream.close()
             # Terminate the PortAudio interface
             self.p.terminate()
+        else:
+            print("Emergency mode ON - can't start recording")
         
     def stop(self):
         self.recording = False
@@ -90,9 +90,8 @@ class Recorder:
         self.client.publish(channel, byteArray)
 
     def switch_emg_mode(self):
-        print("before " + str(self.emg_mode))
         self.emg_mode = not self.emg_mode
-        print("after " + str(self.emg_mode))
+        print("Emergency mode: " + str(self.emg_mode))
          
     def create_machine(self, name): 
         t0 = {'source': 'initial', 'target': 'ready'}
