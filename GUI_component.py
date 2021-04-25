@@ -28,14 +28,15 @@ class GUI:
         print("Stop recording")
 
     def recording_emg(self):
-        # self.driver.send('emg_msg', 'recorder_stm')
-        # self.driver.send('emg_msg', 'playback_stm')
+        self.driver.send('emg_msg', 'recorder_stm')
+        self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('start', 'recorder_emg_stm')
         print("Start emergency recording")
 
+    # TODO: different triggers for start/stop emg msg, as double clicking one of them leads to undesired behaviour
     def stop_recording_emg(self):
-        # self.driver.send('emg_msg', 'recorder_stm')
-        # self.driver.send('emg_msg', 'playback_stm')
+        self.driver.send('emg_msg', 'recorder_stm')
+        self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('stop', 'recorder_emg_stm')
         print("Stop recording emergency")
 

@@ -50,7 +50,6 @@ class Recorder:
             self.recording = True
             while self.recording:
                 data = stream.read(self.chunk)
-                # print(type(data))
                 self.frames.append(data)
             # Stop and close the stream 
             stream.stop_stream()
@@ -69,29 +68,30 @@ class Recorder:
         self.stop()
     
     def process(self):
-        newChannel = open("audio_files/channel.txt", "r")
-        channel = newChannel.readline()
+        if not self.emg_mode:
+            newChannel = open("audio_files/channel.txt", "r")
+            channel = newChannel.readline()
 
-        # Save the recorded data as a WAV file
-        wf = wave.open(self.filename, 'wb')
-        wf.setnchannels(self.channels)
-        wf.setsampwidth(self.p.get_sample_size(self.sample_format))
-        wf.setframerate(self.fs)
-        wf.writeframes(b''.join(self.frames))
-        wf.close()
-        
-        f = open(self.filename, "rb")
-        imagestring = f.read()
-        f.close()
+            # Save the recorded data as a WAV file
+            wf = wave.open(self.filename, 'wb')
+            wf.setnchannels(self.channels)
+            wf.setsampwidth(self.p.get_sample_size(self.sample_format))
+            wf.setframerate(self.fs)
+            wf.writeframes(b''.join(self.frames))
+            wf.close()
+            
+            f = open(self.filename, "rb")
+            imagestring = f.read()
+            f.close()
 
-        byteArray = bytearray(imagestring)
+            byteArray = bytearray(imagestring)
 
-        # Send message over mqtt
-        self.client.publish(channel, byteArray)
+            # Send message over mqtt
+            self.client.publish(channel, byteArray)
 
     def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
-        print("Emergency mode: " + str(self.emg_mode))
+        print("Emergency mode switched to: " + str(self.emg_mode) + " in record_stm")
          
     def create_machine(self, name): 
         t0 = {'source': 'initial', 'target': 'ready'}
@@ -100,7 +100,7 @@ class Recorder:
         t3 = {'trigger': 'done', 'source': 'processing', 'target': 'ready'}
         t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready', 'effect': 'timeout'}
         t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
-        t6 = {'trigger': 'emg_msg', 'source': 'recording', 'target': 'recording', 'effect': 'switch_emg_mode'}
+        t6 = {'trigger': 'emg_msg', 'source': 'recording', 'target': 'recording', 'effect': 'switch_emg_mode; stop'}
         
         s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()", 'entry': 'start_timer("t", 30000)'}
         s_processing = {'name': 'processing', 'do': 'process()'}

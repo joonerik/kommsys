@@ -20,7 +20,6 @@ class RecorderEmergency:
         self.fs = 44100  # Record at 44100 samples per second
         self.filename = "audio_files/input_audio/" + "emergency" + ".wav"
         self.p = pyaudio.PyAudio()
-        print("init recorderemg")
 
     def start(self, broker, port):
         self.client = mqtt.Client()
