@@ -32,7 +32,7 @@ class GUI:
 
     def __init__(self):
         self.app = gui()
-        self.a = ""
+        self.channel_number = open("audio_files/channel.txt", "r").readline()
         self.channelEdit = False
         self.coords = {
             "Record": [76, 404, 188, 483],
@@ -62,7 +62,7 @@ class GUI:
         self.driver.start(keep_active=True)
         self.create_driver()
 
-    def click(self,area):
+    def click(self, area):
         self.app.setLabel("l1", area)
         if area == "SOS":
             print("SOS click")
@@ -90,12 +90,12 @@ class GUI:
         k = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         if self.channelEdit:
             if area in k:
-                self.a += area
+                self.channel_number += area
             if area == "done":
                 self.channelEdit = False
-                self.app.setLabel("channelnow", "Current channel: " + self.a)
-                self.change_channel(self.a)
-                self.a = "" 
+                self.app.setLabel("channelnow", "Current channel: " + self.channel_number)
+                self.change_channel(self.channel_number)
+                self.channel_number = "" 
         self.app.go()
 
     def create_gui(self):
@@ -119,7 +119,8 @@ class GUI:
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Display:',0,2)
-        self.app.addLabel("channelnow", "Current channel: " + "1")
+        self.app.addLabel("channelnow", "Current channel: " + self.channel_number)
+        self.channel_number = ""
         #self.app.addLabel('Current Status: Listening', None)
         #self.app.addLabel('Current Volume: 15', None)
         self.app.stopLabelFrame()
