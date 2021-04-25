@@ -54,7 +54,6 @@ class Recorder:
                 data = stream.read(self.chunk)
                 # print(type(data))
                 self.frames.append(data)
-            print("done recording")
             # Stop and close the stream 
             stream.stop_stream()
             stream.close()
@@ -62,7 +61,6 @@ class Recorder:
             self.p.terminate()
         
     def stop(self):
-        print("stop")
         self.recording = False
         self.stm.stop_timer('t')
 
@@ -71,7 +69,6 @@ class Recorder:
         self.stop()
     
     def process(self):
-        print("processing")
         newChannel = open("audio_files/channel.txt", "r")
         channel = newChannel.readline()
 

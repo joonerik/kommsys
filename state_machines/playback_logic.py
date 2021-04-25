@@ -66,7 +66,7 @@ class Player:
                 data = wf.readframes(chunk)
 
             # Close and terminate the stream
-            print("play msg finished")
+            print("Message is finished")
             stream.close()
             p.terminate()
 
