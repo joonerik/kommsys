@@ -16,63 +16,19 @@ class GUI:
         self.driver.add_machine(playback.create_machine('playback_stm'))
         self.driver.start()
 
-    def print_to_receiving(self):
-        print("transition: idle to receiving, trigger: msg_received")
-
-    def print_to_sending(self): 
-        print("transition: idle to sending, trigger: start in recorder_stm")
-
     def recording(self):
-        self.print_to_sending()
         self.driver.send('start', 'recorder_stm')
+        print("Start recording")
 
     def stop_recording(self):
         self.driver.send('stop', 'recorder_stm')
-
-    def play_msg_signal(self):
-        self.driver.send('start', 'playback_stm')
+        print("Stop recording")
 
     def change_channel(self, channel):
-
         newChannel = open("audio_files/channel.txt", "w")
         newChannel.write(channel)
-
+        print("Change channel to: " + str(channel))
         self.driver.send('change_channel_signal', 'playback_stm')
-    
-    def A(self):
-        print("internal transition")
-
-    def receive_emg_msg(self):
-        print("'A emg msg was received!'")
-        self.driver.send('emg_msg', 'recorder_stm')
-        self.app.setImage("show", "img/rsos.png")
-        self.app.setImageMap("show", self.click, self.coords)
-        # self.stm.driver.send('emg_msg', 'playback_stm')
-
-    def finish_emg_msg(self):
-        print("'The emg msg is done playing!'")
-        self.driver.send('emg_msg', 'recorder_stm')
-        self.app.setImage('show', "img/idle2.png")
-        self.app.setImageMap("show", self.click, self.coords)
-        # self.stm.driver.send('emg_msg', 'playback_stm')
-    
-    def print_back_to_idle(self):
-        print("back to idle state")
-
-    def print_to_receiving_emg_msg(self):
-        print("going to receiving_emg_msg state")
-        
-    def print_to_sending_emg_msg(self):
-        print("going to sending_emg_msg state")
-    
-    def print_start_machine(self):
-        print("start machine")
-
-    def print_do(self):
-        print("this is a do")
-
-    def print_timer(self):
-        print("timer expired, going to idle state")
 
     def __init__(self):
         self.app = gui()
@@ -109,20 +65,17 @@ class GUI:
     def click(self,area):
         self.app.setLabel("l1", area)
         if area == "SOS":
-            self.driver.send('emg_msg', 'recorder_stm')
+            print("SOS click")
             self.app.setImage("show", "img/ssos.png")
             self.app.setImageMap("show", self.click, self.coords)
-            print("sending emergency message")
         if area == "Record":
             self.recording()
-            #self.stm.driver.send('start', 'recorder_stm')
             self.app.setImage("show", "img/recording.png")
             self.app.setImageMap("show", self.click, self.coords)
-            print("sending message")
         if area == "channel":
             # self.app.setImage("show", "/Users/cecilie/Desktop/ntnu/Frame 2.png")
             self.app.setImageMap("show", self.click, self.coords)
-            print("channel changed")
+            print("NOT IN USE: channel??")
         if area == None:
             self.app.setImage('show', "img/idle2.png")
             self.app.setImageMap("show", self.click, self.coords)
@@ -142,29 +95,27 @@ class GUI:
                 self.channelEdit = False
                 self.app.setLabel("channelnow", "Current channel: " + self.a)
                 self.change_channel(self.a)
-                # self.change_channel()
-                self.a = ""
-
-
+                self.a = "" 
+        self.app.go()
 
     def create_gui(self):
 
         self.app.setFont(14)
-
-
         #self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
         #self.app.addButton('Record message', self.recording)
         #self.app.addButton('Emergency', None)
         # self.app.stopLabelFrame()
 
+        # The "not click" ones are not in use, but removing them leads to a weird UI
+        # which I do not intend to fix atm
         self.app.startLabelFrame('Releasing buttons:', 0,1)
-        self.app.addButton('Play message', self.play_msg_signal)
-        self.app.addLabelEntry("Channel", None)
-        self.app.addButton('Change channel', self.change_channel)
+        self.app.addButton('Do not click1', None)
+        self.app.addLabelEntry("Do not click/write", None)
+        self.app.addButton('Do not click2', None)
         self.app.addButton('Release record', self.stop_recording)
-        self.app.addButton('Release emergency', None)
-        self.app.addButton('Emergency msg received', self.receive_emg_msg)
-        self.app.addButton('Emergency msg finished', self.finish_emg_msg)
+        self.app.addButton('Do not click3', None)
+        self.app.addButton('Do not click4', None)
+        self.app.addButton('Do not click5', None)
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Display:',0,2)
