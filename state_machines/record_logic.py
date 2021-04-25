@@ -40,7 +40,6 @@ class Recorder:
         print("on_connect(): {}".format(mqtt.connack_string(rc)))
         
     def record(self):
-        print(self.emg_mode)
         if not self.emg_mode:
             self.p = pyaudio.PyAudio() 
             stream = self.p.open(format=self.sample_format,
@@ -65,10 +64,14 @@ class Recorder:
     def stop(self):
         print("stop")
         self.recording = False
+        self.stm.stop_timer('t')
+
+    def timeout(self):
+        print("recording timed out")
+        self.stop()
     
     def process(self):
         print("processing")
-
         newChannel = open("audio_files/channel.txt", "r")
         channel = newChannel.readline()
 
@@ -99,7 +102,7 @@ class Recorder:
         t1 = {'trigger': 'start', 'source': 'ready', 'target': 'recording'}
         t2 = {'trigger': 'done', 'source': 'recording', 'target': 'processing'}
         t3 = {'trigger': 'done', 'source': 'processing', 'target': 'ready'}
-        t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready'}
+        t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready', 'effect': 'timeout'}
         t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
         t6 = {'trigger': 'emg_msg', 'source': 'recording', 'target': 'recording', 'effect': 'switch_emg_mode'}
         
