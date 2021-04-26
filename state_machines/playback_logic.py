@@ -6,7 +6,6 @@ import paho.mqtt.client as mqtt
 import os
 import pyaudio
 import wave
-import json
 
 broker, port = "mqtt.item.ntnu.no", 1883
         
@@ -21,7 +20,6 @@ class Player:
         self.client.subscribe("emg")
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
-        self.player = None
 
         try:
             thread = Thread(target=self.client.loop_forever)
@@ -29,95 +27,50 @@ class Player:
         except KeyboardInterrupt:
             print("Interrupted")
             self.client.disconnect()
-    
-    p = pyaudio.PyAudio()
-    chunk = 256
-    player = p.open(format=pyaudio.paInt16, 
-                            channels=1, 
-                            rate=44100, 
-                            frames_per_buffer = chunk,
-                            output=True)
-
-    print("Message is finished")
-    player.close()
-    p.terminate()
-
-    def play(self):
-        if not self.emg_mode:
-            # Set chunk size of 1024 samples per data frame
-
-            channels = 1
-            sample_format = pyaudio.paInt16
-            fs = 44100
-            p = pyaudio.PyAudio()
-            chunk = 256
-
-            # Open the sound file 
-            #wf = wave.open(self.filename, 'rb')
-
-            # Create an interface to PortAudio
-
-            # Open a .Stream object to write the WAV file to
-            # 'output = True' indicates that the sound will be played rather than recorded
-            #stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
-            #                channels = wf.getnchannels(),
-            #                rate = wf.getframerate(),
-            #                output = True)
-            p = pyaudio.PyAudio()
-            chunk = 256
-            player = p.open(format=pyaudio.paInt16, 
-                                    channels=1, 
-                                    rate=44100, 
-                                    frames_per_buffer = chunk,
-                                    output=True)
-
-            print("Message is finished")
-            player.close()
-            p.terminate()
-            # Audio player
-           # player = p.open(format=pyaudio.paInt16, 
-            #                channels=1, 
-             #               rate=44100, 
-              #              frames_per_buffer = chunk,
-               #             output=True)
-
-           # print("Message is finished")
-        #player.close()
-            #p.terminate()
-
-            # Read data in chunks
-            #data = wf.readframes(chunk)
-            # Play the sound by writing the audio data to the stream
-            #while data != (b'') and not self.emg_mode:
-            #    stream.write(data)
-            #    data = wf.readframes(chunk)
-
-            # Close and terminate the stream
-           
-        else:
-            # TODO: Test if an incoming message on a channel subscribed is ignored if a emg msg is playing
-            # Remember to argue for this in the systemSpec. It is also not likely that a person is
-            # sending a msg while an emg msg is played
-            print("Emergency mode ON - can't play incoming message")
 
     def on_message(self, client, userdata, msg):
-        """print("on_message(): topic: {}".format(msg.topic))
+        print("on_message(): topic: {}".format(msg.topic))
         f = open(self.filename, 'wb')
         f.write(msg.payload)
         f.close()
 
         # reduce_noise(self.filename)
-        self.stm.send("start")"""
-        try:
-            data_in = json.loads(msg.payload)
+        self.stm.send("start")
+        
+    def play(self):
+        if not self.emg_mode:
+            # Set chunk size of 1024 samples per data frame
+            chunk = 1024  
 
-            audiochunks = data_in["audio"]
+            # Open the sound file 
+            wf = wave.open(self.filename, 'rb')
 
-            for i in range(10):
-                player.write(bytes.fromhex(audiochunks[i]), chunk)
+            # Create an interface to PortAudio
+            p = pyaudio.PyAudio()
 
-        except ValueError:
-            pass
+            # Open a .Stream object to write the WAV file to
+            # 'output = True' indicates that the sound will be played rather than recorded
+            stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
+                            channels = wf.getnchannels(),
+                            rate = wf.getframerate(),
+                            output = True)
+
+            # Read data in chunks
+            data = wf.readframes(chunk)
+            # Play the sound by writing the audio data to the stream
+            while data != (b'') and not self.emg_mode:
+                stream.write(data)
+                data = wf.readframes(chunk)
+
+            # Close and terminate the stream
+            print("Message is finished")
+            stream.close()
+            p.terminate()
+        else:
+            # TODO: Test if an incoming message on a channel subscribed is ignored if a emg msg is playing
+            # Remember to argue for this in the systemSpec. It is also not likely that a person is
+            # sending a msg while an emg msg is played
+            print("Emergency mode ON - can't play incoming message")
 
     def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
