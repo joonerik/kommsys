@@ -1,14 +1,3 @@
-
-#UFERDIG
-
-
-
-
-
-
-
-
-
 import wave
 import speech_recognition as sr
 import logging
@@ -32,7 +21,7 @@ p = pyaudio.PyAudio()
 chunk = 248
 
 # Audio messages
-message_dict = {}
+messages = []
 
 # MQTT setup
 def setup_mqtt():
@@ -51,13 +40,21 @@ logging.basicConfig(format='%(asctime)s %(message)s',
 
 # Message handler
 r = sr.Recognizer()
+sending_user = ""
+initial_mes_time = ""
+mes_number = 0
 def on_message(client, userdata, msg):
     try:
         data_in = json.loads(msg.payload)
 
         audiochunks = data_in["audio"]
-
-        for i in range(10):
+        #UFERDIG
+        if data_in["user"] == sending_user and 
+           data_in["time"] == initial_mes_time:
+            for i in range(10):
+                messages[mes_number]["msg_chunk_list"].append(audiochunks[i])
+        else:
+            messages.append(json.loads(msg.payload))
             
     except ValueError:
         pass  
