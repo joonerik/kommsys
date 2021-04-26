@@ -39,8 +39,8 @@ class Player:
             self.client.disconnect()
 
     def on_message(self, client, userdata, msg):
-        print(msg.payload["id"])
-        if self.id == json.loads(msg.payload["id"]):
+        data_id = (json.loads(msg.payload))["id"]
+        if str(self.id) != str(data_id):
             if not self.emg_mode:
                 try:
                     data = json.loads(msg.payload)
