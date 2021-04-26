@@ -24,7 +24,7 @@ class Player:
 
         self.p = pyaudio.PyAudio()
         self.player = self.p.open(format=pyaudio.paInt16, 
-                        channels=2, 
+                        channels=1, 
                         rate=44100, 
                         frames_per_buffer = 256,
                         output=True)

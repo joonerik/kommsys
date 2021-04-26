@@ -9,7 +9,7 @@ port = 1883
 topic = '1'
 
 # Audio settings
-channels = 2
+channels = 1
 sample_format = pyaudio.paInt16
 fs = 44100
 p = pyaudio.PyAudio()
@@ -17,7 +17,7 @@ chunk = 256
 
 # Audio player
 player = p.open(format=pyaudio.paInt16, 
-                        channels=2, 
+                        channels=1, 
                         rate=44100, 
                         frames_per_buffer = chunk,
                         output=True)
