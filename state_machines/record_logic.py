@@ -16,7 +16,7 @@ class Recorder:
         self.emg_mode = False
         self.chunk = 256  # Record in chunks of 1024 samples
         self.sample_format = pyaudio.paInt16  # 16 bits per sample
-        self.channels = 2
+        self.channels = 1
         self.fs = 44100  # Record at 44100 samples per second
         self.filename = "audio_files/input_audio/" + str(uuid.uuid4()) + ".wav"
         self.p = pyaudio.PyAudio()
@@ -48,7 +48,8 @@ class Recorder:
             self.recording = True
 
             # Record loop
-            topic = open("audio_files/channel.txt", "r").readline()
+            #topic = open("audio_files/channel.txt", "r").readline()
+            topic = "1"
             while self.recording:
                 audiochunks = []
 

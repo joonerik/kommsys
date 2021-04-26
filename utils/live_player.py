@@ -6,10 +6,10 @@ import json
 # MQTT settings
 broker = "mqtt.item.ntnu.no"
 port = 1883
-topic = 'team13'
+topic = '1'
 
 # Audio settings
-channels = 1
+channels = 2
 sample_format = pyaudio.paInt16
 fs = 44100
 p = pyaudio.PyAudio()
