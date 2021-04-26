@@ -13,7 +13,7 @@ class LiveRecorder:
         self.mqtt_client = mqtt_client
         self.recording = False
         self.p = pyaudio.PyAudio()
-        self.chunk = 248
+        self.chunk = 256
 
     # Record and send as numpy array
     def record(self, topic):
