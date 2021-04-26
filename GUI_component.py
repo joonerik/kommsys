@@ -4,16 +4,19 @@ import time
 import fileinput
 from state_machines.record_logic import Recorder
 from state_machines.playback_logic import Player
+from state_machines.record_emg_logic import RecorderEmergency
 
 class GUI:
 
     def create_driver(self):
         recorder = Recorder()
         playback = Player()
+        recorder_emg = RecorderEmergency()
 
         self.driver = stmpy.Driver()
         self.driver.add_machine(recorder.create_machine('recorder_stm'))
         self.driver.add_machine(playback.create_machine('playback_stm'))
+        self.driver.add_machine(recorder_emg.create_machine('recorder_emg_stm'))
         self.driver.start()
 
     def recording(self):
@@ -24,6 +27,19 @@ class GUI:
         self.driver.send('stop', 'recorder_stm')
         print("Stop recording")
 
+    def recording_emg(self):
+        self.driver.send('emg_msg', 'recorder_stm')
+        self.driver.send('emg_msg', 'playback_stm')
+        self.driver.send('start', 'recorder_emg_stm')
+        print("Start emergency recording")
+
+    # TODO: different triggers for start/stop emg msg, as double clicking one of them leads to undesired behaviour
+    def stop_recording_emg(self):
+        self.driver.send('emg_msg', 'recorder_stm')
+        self.driver.send('emg_msg', 'playback_stm')
+        self.driver.send('stop', 'recorder_emg_stm')
+        print("Stop recording emergency")
+
     def change_channel(self, channel):
         newChannel = open("audio_files/channel.txt", "w")
         newChannel.write(channel)
@@ -32,7 +48,7 @@ class GUI:
 
     def __init__(self):
         self.app = gui()
-        self.a = ""
+        self.channel_number = open("audio_files/channel.txt", "r").readline()
         self.channelEdit = False
         self.coords = {
             "Record": [76, 404, 188, 483],
@@ -62,10 +78,11 @@ class GUI:
         self.driver.start(keep_active=True)
         self.create_driver()
 
-    def click(self,area):
+    def click(self, area):
         self.app.setLabel("l1", area)
         if area == "SOS":
             print("SOS click")
+            self.recording_emg()
             self.app.setImage("show", "img/ssos.png")
             self.app.setImageMap("show", self.click, self.coords)
         if area == "Record":
@@ -90,12 +107,12 @@ class GUI:
         k = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         if self.channelEdit:
             if area in k:
-                self.a += area
+                self.channel_number += area
             if area == "done":
                 self.channelEdit = False
-                self.app.setLabel("channelnow", "Current channel: " + self.a)
-                self.change_channel(self.a)
-                self.a = "" 
+                self.app.setLabel("channelnow", "Current channel: " + self.channel_number)
+                self.change_channel(self.channel_number)
+                self.channel_number = "" 
         self.app.go()
 
     def create_gui(self):
@@ -113,13 +130,14 @@ class GUI:
         self.app.addLabelEntry("Do not click/write", None)
         self.app.addButton('Do not click2', None)
         self.app.addButton('Release record', self.stop_recording)
-        self.app.addButton('Do not click3', None)
+        self.app.addButton('Release emg record', self.stop_recording_emg)
         self.app.addButton('Do not click4', None)
         self.app.addButton('Do not click5', None)
         self.app.stopLabelFrame()
 
         self.app.startLabelFrame('Display:',0,2)
-        self.app.addLabel("channelnow", "Current channel: " + "1")
+        self.app.addLabel("channelnow", "Current channel: " + self.channel_number)
+        self.channel_number = ""
         #self.app.addLabel('Current Status: Listening', None)
         #self.app.addLabel('Current Volume: 15', None)
         self.app.stopLabelFrame()
