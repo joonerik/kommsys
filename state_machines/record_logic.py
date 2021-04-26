@@ -48,6 +48,7 @@ class Recorder:
             self.recording = True
 
             # Record loop
+            topic = open("audio_files/channel.txt", "r").readline()
             while self.recording:
                 audiochunks = []
 
@@ -56,7 +57,6 @@ class Recorder:
 
                 data_dict = {"audio" : audiochunks}
                 
-                topic = open("audio_files/channel.txt", "r").readline()
                 self.client.publish(topic, json.dumps(data_dict))
             
             # Stop and close the stream
