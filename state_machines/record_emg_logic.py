@@ -13,7 +13,7 @@ class RecorderEmergency:
     def __init__(self):
         self.start(broker, port)
         self.recording = False
-        # self.emg_mode = False
+        #self.emg_mode = False
         self.chunk = 1024  # Record in chunks of 1024 samples
         self.sample_format = pyaudio.paInt16  # 16 bits per sample
         self.channels = 1

@@ -22,16 +22,25 @@ class GUI:
     def recording(self):
         self.driver.send('start', 'recorder_stm')
         print("Start recording")
+        self.isRecording = True
+        self.app.setImage("show", "img/recording.png")
+        self.app.setImageMap("show", self.click, self.coords)
 
     def stop_recording(self):
         self.driver.send('stop', 'recorder_stm')
         print("Stop recording")
+        self.app.setImage("show", "img/idle2.png")
+        self.isRecording = False
+        self.app.setImageMap("show", self.click, self.coords)
 
     def recording_emg(self):
         self.driver.send('emg_msg', 'recorder_stm')
         self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('start', 'recorder_emg_stm')
         print("Start emergency recording")
+        self.emgMode = True
+        self.app.setImage("show", "img/ssos.png")
+        self.app.setImageMap("show", self.click, self.coords)
 
     # TODO: different triggers for start/stop emg msg, as double clicking one of them leads to undesired behaviour
     def stop_recording_emg(self):
@@ -39,6 +48,9 @@ class GUI:
         self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('stop', 'recorder_emg_stm')
         print("Stop recording emergency")
+        self.emgMode = False
+        self.app.setImage("show", "img/idle2.png")
+        self.app.setImageMap("show", self.click, self.coords)
 
     def change_channel(self, channel):
         newChannel = open("audio_files/channel.txt", "w")
@@ -50,6 +62,9 @@ class GUI:
         self.app = gui()
         self.channel_number = open("audio_files/channel.txt", "r").readline()
         self.channelEdit = False
+        self.isRecording = False
+        self.emgMode = False
+        self.isPlaying = False
         self.coords = {
             "Record": [76, 404, 188, 483],
             "SOS": [79, 496, 178, 533],
@@ -65,44 +80,36 @@ class GUI:
             "8": [158, 652, 224, 684],
             "9": [241, 652, 301, 684],
             "0": [158, 702, 224, 726],
-            "+": [83, 702, 138, 726],
+            "change channel": [83, 702, 138, 726],
             "done": [241, 702, 301, 726]
         }
         self.app.addImage("show", "img/idle.png", 0, 0)
         self.app.setImageMap("show", self.click, self.coords)
 
         self.app.addLabel("l1", "<click on the device>")
-        self.app.addLabel("channel", "" + str(50) + "")
 
         self.driver = stmpy.Driver()
         self.driver.start(keep_active=True)
         self.create_driver()
 
     def click(self, area):
-        self.app.setLabel("l1", area)
+        self.app.setLabel("l1", "Latest area clicked: " + area)
         if area == "SOS":
-            print("SOS click")
-            self.recording_emg()
-            self.app.setImage("show", "img/ssos.png")
-            self.app.setImageMap("show", self.click, self.coords)
-        if area == "Record":
-            self.recording()
-            self.app.setImage("show", "img/recording.png")
-            self.app.setImageMap("show", self.click, self.coords)
-        if area == "channel":
-            # self.app.setImage("show", "/Users/cecilie/Desktop/ntnu/Frame 2.png")
-            self.app.setImageMap("show", self.click, self.coords)
-            print("NOT IN USE: channel??")
+            if not self.emgMode:
+                self.recording_emg()
+                print("SOS click")
+            else:
+                self.stop_recording_emg()
+
+        if area == "Record" and not self.emgMode:
+            if not self.isRecording:
+                self.recording()
+            else:
+                self.stop_recording()
         if area == None:
             self.app.setImage('show', "img/idle2.png")
             self.app.setImageMap("show", self.click, self.coords)
-        """for k in ["0","1","2","3","4","5","6","7","8","9"]:
-            if area == k:
-                self.a = area
-                self.app.setLabel("channelnow", "Channel: " + self.a)
-                self.change_channel()
-                break"""
-        if area == "+":
+        if area == "change channel" and not self.emgMode:
             self.channelEdit = True
         k = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         if self.channelEdit:
@@ -117,29 +124,11 @@ class GUI:
 
     def create_gui(self):
 
-        self.app.setFont(14)
-        #self.app.startLabelFrame('Starting walkie talkie/ Home screen:')
-        #self.app.addButton('Record message', self.recording)
-        #self.app.addButton('Emergency', None)
-        # self.app.stopLabelFrame()
-
-        # The "not click" ones are not in use, but removing them leads to a weird UI
-        # which I do not intend to fix atm
-        self.app.startLabelFrame('Releasing buttons:', 0,1)
-        self.app.addButton('Do not click1', None)
-        self.app.addLabelEntry("Do not click/write", None)
-        self.app.addButton('Do not click2', None)
-        self.app.addButton('Release record', self.stop_recording)
+        self.app.setFont(16)
+        self.app.startLabelFrame('Info:', 0,2)
         self.app.addButton('Release emg record', self.stop_recording_emg)
-        self.app.addButton('Do not click4', None)
-        self.app.addButton('Do not click5', None)
-        self.app.stopLabelFrame()
-
-        self.app.startLabelFrame('Display:',0,2)
         self.app.addLabel("channelnow", "Current channel: " + self.channel_number)
         self.channel_number = ""
-        #self.app.addLabel('Current Status: Listening', None)
-        #self.app.addLabel('Current Volume: 15', None)
         self.app.stopLabelFrame()
 
         self.app.go()
