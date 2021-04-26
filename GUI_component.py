@@ -5,19 +5,36 @@ import fileinput
 from state_machines.record_logic import Recorder
 from state_machines.playback_logic import Player
 from state_machines.record_emg_logic import RecorderEmergency
+from threading import Thread
+from os import system
+import paho.mqtt.client as mqtt
+
+broker, port = "mqtt.item.ntnu.no", 1883
 
 class GUI:
 
+
     def create_driver(self):
-        recorder = Recorder()
-        playback = Player()
-        recorder_emg = RecorderEmergency()
+        self.recorder = Recorder()
+        self.playback = Player()
+        self.recorder_emg = RecorderEmergency()
 
         self.driver = stmpy.Driver()
-        self.driver.add_machine(recorder.create_machine('recorder_stm'))
-        self.driver.add_machine(playback.create_machine('playback_stm'))
-        self.driver.add_machine(recorder_emg.create_machine('recorder_emg_stm'))
+        self.driver.add_machine(self.recorder.create_machine('recorder_stm'))
+        self.driver.add_machine(self.playback.create_machine('playback_stm'))
+        self.driver.add_machine(self.recorder_emg.create_machine('recorder_emg_stm'))
         self.driver.start()
+
+    def listening(self):
+        self.app.setImage("show", "img/listening.png")
+        self.app.setImageMap("show", self.click, self.coords)
+        self.playback.isPlaying = True
+
+    def done_listening(self):
+        self.app.setImage("show", "img/idle2.png")
+        self.app.setImageMap("show", self.click, self.coords)
+        self.playback.isPlaying = False
+
 
     def recording(self):
         self.driver.send('start', 'recorder_stm')
@@ -59,8 +76,15 @@ class GUI:
         self.driver.send('change_channel_signal', 'playback_stm')
 
     def __init__(self):
+        self.client = mqtt.Client()
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
+        print("Connecting to {}:{}".format(broker, port))
+        self.client.connect(broker, port)
+
         self.app = gui()
         self.channel_number = open("audio_files/channel.txt", "r").readline()
+        self.client.subscribe(self.channel_number)
         self.channelEdit = False
         self.isRecording = False
         self.emgMode = False
@@ -91,6 +115,23 @@ class GUI:
         self.driver = stmpy.Driver()
         self.driver.start(keep_active=True)
         self.create_driver()
+
+        try:
+            thread = Thread(target=self.client.loop_forever)
+            thread.start()
+        except KeyboardInterrupt:
+            print("Interrupted")
+            self.client.disconnect()
+
+    def on_connect(self, client, userdata, flags, rc):
+        print("on_connect(): {}".format(mqtt.connack_string(rc)))
+
+    def on_message(self, client, userdata, msg):
+        print("on_message(): topic: {}".format(msg.topic))
+        if not self.isPlaying:
+            self.listening()
+        else:
+            self.done_listening()
 
     def click(self, area):
         self.app.setLabel("l1", "Latest area clicked: " + area)

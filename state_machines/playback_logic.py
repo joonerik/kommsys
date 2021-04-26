@@ -20,6 +20,7 @@ class Player:
         self.client.subscribe("emg")
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
+        self.isPlaying = False
 
         try:
             thread = Thread(target=self.client.loop_forever)
@@ -38,7 +39,10 @@ class Player:
         self.stm.send("start")
         
     def play(self):
+        self.isPlaying = True
         if not self.emg_mode:
+
+
             # Set chunk size of 1024 samples per data frame
             chunk = 1024  
 
@@ -66,6 +70,7 @@ class Player:
             print("Message is finished")
             stream.close()
             p.terminate()
+
         else:
             # TODO: Test if an incoming message on a channel subscribed is ignored if a emg msg is playing
             # Remember to argue for this in the systemSpec. It is also not likely that a person is
