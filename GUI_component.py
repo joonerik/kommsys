@@ -8,10 +8,37 @@ from state_machines.record_emg_logic import RecorderEmergency
 from threading import Thread
 from os import system
 import paho.mqtt.client as mqtt
+import time
 
 broker, port = "mqtt.item.ntnu.no", 1883
 
 class GUI:
+
+    def count(self,t):
+
+        while t < 3:
+            mins, secs = divmod(t, 60)
+            timer = '{:02d}:{:02d}'.format(mins, secs)
+            print(timer, end="\r")
+            time.sleep(1)
+            t += 1
+            print(t)
+            self.update()
+
+    def update(self):
+        state = self.playback.stm.state
+        state2 = self.recorder_emg.stm.state
+        print(state)
+        print(state2)
+        if state2 == "s_processing":
+            self.emg_listening()
+        if state == "playing":
+            self.listening()
+        if state == "ready":
+            self.app.setImage("show", "img/idle2.png")
+            print("hello")
+            self.app.setImageMap("show", self.click, self.coords)
+
 
 
     def create_driver(self):
@@ -29,6 +56,13 @@ class GUI:
         self.app.setImage("show", "img/listening.png")
         self.app.setImageMap("show", self.click, self.coords)
         self.playback.isPlaying = True
+        self.timer = self.count(1)
+
+    def emg_listening(self):
+        self.app.setImage("show", "img/rsos.png")
+        self.app.setImageMap("show", self.click, self.coords)
+        #self.playback.isPlaying = True
+        self.timer = self.count(1)
 
     def done_listening(self):
         self.app.setImage("show", "img/idle2.png")
@@ -76,6 +110,7 @@ class GUI:
         self.driver.send('change_channel_signal', 'playback_stm')
 
     def __init__(self):
+
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
@@ -87,8 +122,9 @@ class GUI:
         self.client.subscribe(self.channel_number)
         self.channelEdit = False
         self.isRecording = False
-        self.emgMode = False
+        self.isEmg = False
         self.isPlaying = False
+        self.emgMode = False
         self.coords = {
             "Record": [76, 404, 188, 483],
             "SOS": [79, 496, 178, 533],
@@ -116,6 +152,7 @@ class GUI:
         self.driver.start(keep_active=True)
         self.create_driver()
 
+
         try:
             thread = Thread(target=self.client.loop_forever)
             thread.start()
@@ -126,12 +163,18 @@ class GUI:
     def on_connect(self, client, userdata, flags, rc):
         print("on_connect(): {}".format(mqtt.connack_string(rc)))
 
+    #klarer ikke motta meldinger når det kommer fra emergency stm.
     def on_message(self, client, userdata, msg):
+        print(self.playback.stm.state)
         print("on_message(): topic: {}".format(msg.topic))
-        if not self.isPlaying:
-            self.listening()
+        print(self.playback.emg_mode)
+        if self.recorder_emg.playing:
+            self.emg_listening()
         else:
-            self.done_listening()
+            self.listening()
+            print(self.playback.stm.state)
+
+
 
     def click(self, area):
         self.app.setLabel("l1", "Latest area clicked: " + area)
@@ -167,7 +210,7 @@ class GUI:
 
         self.app.setFont(16)
         self.app.startLabelFrame('Info:', 0,2)
-        self.app.addButton('Release emg record', self.stop_recording_emg)
+        #self.app.addButton('Release emg record', self.stop_recording_emg)
         self.app.addLabel("channelnow", "Current channel: " + self.channel_number)
         self.channel_number = ""
         self.app.stopLabelFrame()

@@ -13,6 +13,7 @@ class RecorderEmergency:
     def __init__(self):
         self.start(broker, port)
         self.recording = False
+        self.playing = False
         #self.emg_mode = False
         self.chunk = 1024  # Record in chunks of 1024 samples
         self.sample_format = pyaudio.paInt16  # 16 bits per sample
@@ -66,6 +67,7 @@ class RecorderEmergency:
         self.stop()
     
     def process(self):
+        self.playing = True
         channel = "emg"
         # Save the recorded data as a WAV file
         wf = wave.open(self.filename, 'wb')
@@ -80,6 +82,7 @@ class RecorderEmergency:
         f.close()
 
         byteArray = bytearray(imagestring)
+
 
         # Send message over mqtt
         self.client.publish(channel, byteArray)
