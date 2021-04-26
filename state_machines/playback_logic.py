@@ -6,6 +6,7 @@ import paho.mqtt.client as mqtt
 import os
 import pyaudio
 import wave
+import json
 
 broker, port = "mqtt.item.ntnu.no", 1883
         
@@ -21,6 +22,13 @@ class Player:
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
 
+        self.p = pyaudio.PyAudio()
+        self.player = self.p.open(format=pyaudio.paInt16, 
+                        channels=2, 
+                        rate=44100, 
+                        frames_per_buffer = 256,
+                        output=True)
+
         try:
             thread = Thread(target=self.client.loop_forever)
             thread.start()
@@ -30,12 +38,24 @@ class Player:
 
     def on_message(self, client, userdata, msg):
         print("on_message(): topic: {}".format(msg.topic))
-        f = open(self.filename, 'wb')
-        f.write(msg.payload)
-        f.close()
+        # f = open(self.filename, 'wb')
+        # f.write(msg.payload)
+        # f.close()
 
-        # reduce_noise(self.filename)
-        self.stm.send("start")
+        # # reduce_noise(self.filename)
+        # self.stm.send("start")
+
+        if not self.emg_mode:
+            try:
+                data = json.loads(msg.payload)
+                audiochunks = data["audio"]
+
+                for i in range(10):
+                    while not self.emg_mode:
+                        self.player.write(bytes.fromhex(audiochunks[i]), 256)
+            except ValueError:
+                print("ValueError raised !!!")
+                pass
         
     def play(self):
         if not self.emg_mode:
