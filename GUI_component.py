@@ -5,13 +5,18 @@ import fileinput
 from state_machines.record_logic import Recorder
 from state_machines.playback_logic import Player
 from state_machines.record_emg_logic import RecorderEmergency
+import socket
+from random import randint
 
 class GUI:
 
     def create_driver(self):
-        recorder = Recorder()
-        playback = Player()
-        recorder_emg = RecorderEmergency()
+        
+        self.id = socket.gethostname() + str(randint(0,100))
+
+        recorder = Recorder(self.id)
+        playback = Player(self.id)
+        recorder_emg = RecorderEmergency(self.id)
 
         self.driver = stmpy.Driver()
         self.driver.add_machine(recorder.create_machine('recorder_stm'))

@@ -10,7 +10,7 @@ import json
 broker, port = "mqtt.item.ntnu.no", 1883
 
 class Recorder:
-    def __init__(self):
+    def __init__(self, id):
         self.start(broker, port)
         self.recording = False
         self.emg_mode = False
@@ -20,6 +20,7 @@ class Recorder:
         self.fs = 44100  # Record at 44100 samples per second
         self.filename = "audio_files/input_audio/" + str(uuid.uuid4()) + ".wav"
         self.p = pyaudio.PyAudio()
+        self.id = id
 
     def start(self, broker, port):
         self.client = mqtt.Client()
@@ -55,7 +56,7 @@ class Recorder:
                 for i in range(10):
                     audiochunks.append(stream.read(self.chunk).hex())
 
-                data_dict = {"audio" : audiochunks}
+                data_dict = {"id": self.id, "audio" : audiochunks}
                 
                 self.client.publish(topic, json.dumps(data_dict))
             

@@ -11,7 +11,7 @@ import json
 broker, port = "mqtt.item.ntnu.no", 1883
 
 class RecorderEmergency:
-    def __init__(self):
+    def __init__(self, id):
         self.start(broker, port)
         self.recording = False
         # self.emg_mode = False
@@ -21,6 +21,7 @@ class RecorderEmergency:
         self.fs = 44100  # Record at 44100 samples per second
         self.filename = "audio_files/input_audio/" + "emergency" + ".wav"
         self.p = pyaudio.PyAudio()
+        self.id = id
 
     def start(self, broker, port):
         self.client = mqtt.Client()

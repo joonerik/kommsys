@@ -12,7 +12,7 @@ broker, port = "mqtt.item.ntnu.no", 1883
 
         
 class Player:
-    def __init__(self):
+    def __init__(self, id):
         self.client = mqtt.Client()
         self.client.on_message = self.on_message
         self.client.connect(broker, port)
@@ -22,6 +22,7 @@ class Player:
         self.client.subscribe("emg")
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
+        self.id = id
 
         self.p = pyaudio.PyAudio()
         self.player = self.p.open(format=pyaudio.paInt16, 
@@ -38,17 +39,19 @@ class Player:
             self.client.disconnect()
 
     def on_message(self, client, userdata, msg):
-        if not self.emg_mode:
-            try:
-                data = json.loads(msg.payload)
-                audiochunks = data["audio"]
-                for i in range(10):
-                    # TODO: check emg mode if ongoing receiving msg
-                    # while not self.emg_mode:
-                    self.player.write(bytes.fromhex(audiochunks[i]), 256)
-            except ValueError:
-                print("ValueError raised !!!")
-                pass
+        print(msg.payload["id"])
+        if self.id == json.loads(msg.payload["id"]):
+            if not self.emg_mode:
+                try:
+                    data = json.loads(msg.payload)
+                    audiochunks = data["audio"]
+                    for i in range(10):
+                        # TODO: check emg mode if ongoing receiving msg
+                        # while not self.emg_mode:
+                        self.player.write(bytes.fromhex(audiochunks[i]), 256)
+                except ValueError:
+                    print("ValueError raised !!!")
+                    pass
         
     def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
