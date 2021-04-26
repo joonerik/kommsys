@@ -9,6 +9,7 @@ import wave
 import json
 
 broker, port = "mqtt.item.ntnu.no", 1883
+
         
 class Player:
     def __init__(self):
@@ -22,12 +23,12 @@ class Player:
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
 
-        # self.p = pyaudio.PyAudio()
-        # self.player = self.p.open(format=pyaudio.paInt16, 
-        #                 channels=1, 
-        #                 rate=44100, 
-        #                 frames_per_buffer = 256,
-        #                 output=True)
+        self.p = pyaudio.PyAudio()
+        self.player = self.p.open(format=pyaudio.paInt16, 
+                        channels=1, 
+                        rate=44100, 
+                        frames_per_buffer = 256,
+                        output=True)
 
         try:
             thread = Thread(target=self.client.loop_forever)
@@ -37,30 +38,15 @@ class Player:
             self.client.disconnect()
 
     def on_message(self, client, userdata, msg):
-        # print("on_message(): topic: {}".format(msg.topic))
-        print("ONMESSAGE")
-        # f = open(self.filename, 'wb')
-        # f.write(msg.payload)
-        # f.close()
-
-        # # reduce_noise(self.filename)
-        # self.stm.send("start")
-
+        print("on_message(): topic: {}".format(msg.topic))
         if not self.emg_mode:
             try:
                 data = json.loads(msg.payload)
                 audiochunks = data["audio"]
-                print("audiochunks" + str(audiochunks))
-                player = pyaudio.PyAudio().open(format=pyaudio.paInt16, 
-                        channels=1, 
-                        rate=44100, 
-                        frames_per_buffer = 256,
-                        output=True)
-
                 for i in range(10):
-                    print("loop: " + str(i))
-                    while not self.emg_mode:
-                        player.write(bytes.fromhex(audiochunks[i]), 256)
+                    # TODO: check emg mode if ongoing receiving msg
+                    # while not self.emg_mode:
+                    self.player.write(bytes.fromhex(audiochunks[i]), 256)
             except ValueError:
                 print("ValueError raised !!!")
                 pass
