@@ -48,8 +48,8 @@ class Recorder:
             self.recording = True
 
             # Record loop
-            topic = open("audio_files/channel.txt", "r").readline()
-
+            #topic = open("audio_files/channel.txt", "r").readline()
+            topic = "1"
             while self.recording:
                 audiochunks = []
 
