@@ -34,7 +34,7 @@ class Player:
         f.write(msg.payload)
         f.close()
 
-        reduce_noise(self.filename)
+        # reduce_noise(self.filename)
         self.stm.send("start")
         
     def play(self):
