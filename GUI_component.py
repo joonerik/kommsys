@@ -66,6 +66,8 @@ class GUI:
         self.driver.send('start', 'recorder_emg_stm')
         print("Start emergency recording")
         self.emgMode = True
+        self.app.setBg("red")
+        self.app.setFg("red")
         self.app.setImage("show", "img/ssos.png")
         self.app.setImageMap("show", self.click, self.coords)
 
@@ -76,6 +78,8 @@ class GUI:
         self.driver.send('stop', 'recorder_emg_stm')
         print("Stop recording emergency")
         self.emgMode = False
+        self.app.setBg("mediumslateblue")
+        self.app.setFg("Pink")
         self.app.setImage("show", "img/idle2.png")
         self.app.setImageMap("show", self.click, self.coords)
 
@@ -94,6 +98,9 @@ class GUI:
         self.isEmg = False
         self.isPlaying = False
         self.emgMode = False
+        self.app.setBg("mediumslateblue")
+        self.app.setFg("pink")
+        self.app.setExpand("NONE")
         self.coords = {
             "Record": [76, 404, 188, 483],
             "SOS": [79, 496, 178, 533],
