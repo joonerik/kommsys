@@ -94,7 +94,7 @@ class MessageListener:
                     time_since_first_msg = datetime.now() - datetime.strptime(self.messages[i]["first_msg_time"], "%Y-%m-%d %H:%M:%S.%f")
 
                     # Save audio and speech log for messages older than 30 seconds
-                    if time_since_first_msg > timedelta(seconds=10):
+                    if time_since_first_msg > timedelta(seconds=31):
                         audio_filename = self.save_audio_msg(self.messages[i])
                         self.log_audio_as_text(self.messages[i], audio_filename)
 
@@ -115,23 +115,19 @@ class MessageListener:
         return filename
 
     def log_audio_as_text(self, message, filename): 
-        print("1")   
         # Open
         audio_file = sr.AudioFile(filename)
-        print("2")   
-        r = sr.Recognizer()
-        print("2.5")
+
         with audio_file as source:
-            rec_audio = r.record(source)
-        print("3")   
-        print(type(rec_audio))
-        print(rec_audio)
-        # Interpret
-        interpretation = r.recognize_google(rec_audio)
-        print("4")   
+            rec_audio = sr.Recognizer().record(source)
+
+        # Interpret. Casts exeption for unintelligible sounds
+        try:
+            interpretation = r.recognize_google(rec_audio)
+        except sr.UnknownValueError:
+            pass
 
         # Log
         logging.info("{} {}:\n{}\n".format(message["first_msg_time"], message["id"], interpretation))
-        print("5")   
 
 ml = MessageListener("5")
