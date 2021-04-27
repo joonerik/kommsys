@@ -14,7 +14,6 @@ from random import randint
 class GUI:
 
     def count(self,t):
-
         while t < 60:
             mins, secs = divmod(t, 60)
             timer = '{:02d}:{:02d}'.format(mins, secs)
@@ -26,16 +25,11 @@ class GUI:
             if self.playback.stm.state == "ready":
                 break
 
-
     def update(self):
         state = self.playback.stm.state
-        #print(state)
         if state == "ready":
             self.app.setImage("show", "img/idle2.png")
-            #print("hello")
             self.app.setImageMap("show", self.click, self.coords)
-
-
 
     def create_driver(self):
         self.id = socket.gethostname() + str(randint(0,100))
@@ -49,24 +43,6 @@ class GUI:
         self.driver.add_machine(self.playback.create_machine('playback_stm'))
         self.driver.add_machine(self.recorder_emg.create_machine('recorder_emg_stm'))
         self.driver.start()
-
-    def listening(self):
-        self.app.setImage("show", "img/listening.png")
-        self.app.setImageMap("show", self.click, self.coords)
-        self.playback.isPlaying = True
-        self.timer = self.count(1)
-
-    def emg_listening(self):
-        self.app.setImage("show", "img/rsos.png")
-        self.app.setImageMap("show", self.click, self.coords)
-        #self.playback.isPlaying = True
-        self.timer = self.count(1)
-
-    def done_listening(self):
-        self.app.setImage("show", "img/idle2.png")
-        self.app.setImageMap("show", self.click, self.coords)
-        self.playback.isPlaying = False
-
 
     def recording(self):
         self.driver.send('start', 'recorder_stm')
