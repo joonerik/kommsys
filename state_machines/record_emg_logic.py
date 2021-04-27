@@ -7,6 +7,7 @@ import pyaudio
 import wave
 import uuid
 import json
+from datetime import datetime
 
 broker, port = "mqtt.item.ntnu.no", 1883
 
@@ -54,8 +55,9 @@ class RecorderEmergency:
 
             for i in range(10):
                 audiochunks.append(stream.read(self.chunk).hex())
-
-            data_dict = {"audio" : audiochunks}
+            
+            now = datetime.now()
+            data_dict = {"id": self.id, "time": str(now), "audio": audiochunks}
             
             self.client.publish("emg", json.dumps(data_dict))
         
@@ -71,33 +73,13 @@ class RecorderEmergency:
         self.stm.stop_timer('t')
 
     def timeout(self):
-        print("recording timed out")
+        print("emg recording timed out")
         self.stop()
-    
-    # def process(self):
-    #     channel = "emg"
-    #     # Save the recorded data as a WAV file
-    #     wf = wave.open(self.filename, 'wb')
-    #     wf.setnchannels(self.channels)
-    #     wf.setsampwidth(self.p.get_sample_size(self.sample_format))
-    #     wf.setframerate(self.fs)
-    #     wf.writeframes(b''.join(self.frames))
-    #     wf.close()
-        
-    #     f = open(self.filename, "rb")
-    #     imagestring = f.read()
-    #     f.close()
-
-    #     byteArray = bytearray(imagestring)
-
-    #     # Send message over mqtt
-    #     self.client.publish(channel, byteArray)
 
     def create_machine(self, name): 
         t0 = {'source': 'initial', 'target': 'ready'}
         t1 = {'trigger': 'start', 'source': 'ready', 'target': 'recording'}
         t2 = {'trigger': 'stop', 'source': 'recording', 'target': 'ready', 'effect': 'stop'}
-        # t3 = {'trigger': 'done', 'source': 'processing', 'target': 'ready'}
         t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready', 'effect': 'timeout'}
         
         s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()", 'entry': 'start_timer("t", 30000)'}
