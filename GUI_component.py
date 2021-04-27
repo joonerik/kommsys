@@ -59,6 +59,8 @@ class GUI:
         self.app.setImageMap("show", self.click, self.coords)
 
     def recording_emg(self):
+        if self.isRecording == True:
+            self.driver.send('stop', 'recorder_stm')
         self.driver.send('emg_msg', 'recorder_stm')
         self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('start', 'recorder_emg_stm')
