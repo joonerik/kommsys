@@ -51,14 +51,14 @@ class Recorder:
 
             # Record loop
             topic = open("audio_files/channel.txt", "r").readline()
+            first_msg_time = datetime.now()
             while self.recording:
                 audiochunks = []
 
                 for i in range(10):
                     audiochunks.append(stream.read(self.chunk).hex())
-                
-                now = datetime.now()
-                data_dict = {"id": self.id, "time": str(now), "audio": audiochunks}
+
+                data_dict = {"id": self.id, "first_msg_time": str(first_msg_time), "audio": audiochunks}
                 
                 self.client.publish(topic, json.dumps(data_dict))
             
