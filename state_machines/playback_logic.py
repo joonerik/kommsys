@@ -24,7 +24,7 @@ class Player:
         self.emg_mode = False
         self.id = id 
         self.current_user = None
-        self.emergency_user = None
+        self.emergency_users = []
 
         self.p = pyaudio.PyAudio()
         self.player = self.p.open(format=pyaudio.paInt16, 
@@ -51,17 +51,19 @@ class Player:
         # TODO: use play_audio function instead, as the logic is similar
         # TODO: fix logic where emg is prioritized
         if (str(msg.topic) == "emg"):
-            data_id = (json.loads(msg.payload))["id"]
-            self.current_user = data_id
-            self.emergency_user = self.current_user
+            self.current_user = (json.loads(msg.payload))["id"]
+            if (len(self.emergency_users < 1)):
+                self.emergency_users.append(self.current_user)
+            self.current_user = self.emergency_users[0]
 
             if ((json.loads(msg.payload))["type"] == "bye"):
                 self.current_user = None
                 self.emg_mode = False
-                self.emergency_user = None
+                self.emergency_users = []
+
 
             # missing logic for having the channel occupied if multiple emg messages is played
-            elif (str(self.id) != str(data_id) and self.current_user == self.emergency_user):
+            elif (str(self.id) != str(data_id) and self.current_user == self.emergency_users[0]):
                 self.emg_mode = True
                 try:
                     data = json.loads(msg.payload)
