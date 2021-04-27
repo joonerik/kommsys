@@ -6,6 +6,7 @@ import os
 import pyaudio
 import uuid
 import json
+from datetime import datetime
 
 broker, port = "mqtt.item.ntnu.no", 1883
 
@@ -55,8 +56,9 @@ class Recorder:
 
                 for i in range(10):
                     audiochunks.append(stream.read(self.chunk).hex())
-
-                data_dict = {"id": self.id, "audio" : audiochunks}
+                
+                now = datetime.now()
+                data_dict = {"id": self.id, "time": now, "audio": audiochunks}
                 
                 self.client.publish(topic, json.dumps(data_dict))
             
