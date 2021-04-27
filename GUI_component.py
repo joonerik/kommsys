@@ -14,9 +14,9 @@ broker, port = "mqtt.item.ntnu.no", 1883
 
 class GUI:
 
-    """def count(self,t):
+    def count(self,t):
 
-        while t < 3:
+        while t < 60:
             mins, secs = divmod(t, 60)
             timer = '{:02d}:{:02d}'.format(mins, secs)
             print(timer, end="\r")
@@ -24,20 +24,17 @@ class GUI:
             t += 1
             print(t)
             self.update()
+            if self.playback.stm.state == "ready":
+                break
+
 
     def update(self):
         state = self.playback.stm.state
-        state2 = self.recorder_emg.stm.state
-        print(state)
-        print(state2)
-        if state2 == "s_processing":
-            self.emg_listening()
-        if state == "playing":
-            self.listening()
+        #print(state)
         if state == "ready":
             self.app.setImage("show", "img/idle2.png")
-            print("hello")
-            self.app.setImageMap("show", self.click, self.coords)"""
+            #print("hello")
+            self.app.setImageMap("show", self.click, self.coords)
 
 
 
@@ -56,13 +53,13 @@ class GUI:
         self.app.setImage("show", "img/listening.png")
         self.app.setImageMap("show", self.click, self.coords)
         self.playback.isPlaying = True
-        #self.timer = self.count(1)
+        self.timer = self.count(1)
 
     def emg_listening(self):
         self.app.setImage("show", "img/rsos.png")
         self.app.setImageMap("show", self.click, self.coords)
         #self.playback.isPlaying = True
-        #self.timer = self.count(1)
+        self.timer = self.count(1)
 
     def done_listening(self):
         self.app.setImage("show", "img/idle2.png")
@@ -210,7 +207,7 @@ class GUI:
                 self.channelEdit = False
                 self.app.setLabel("channelnow", "Current channel: " + self.channel_number)
                 self.change_channel(self.channel_number)
-                self.channel_number = "" 
+                self.channel_number = ""
         self.app.go()
 
     def create_gui(self):
