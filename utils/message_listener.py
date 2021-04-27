@@ -9,20 +9,7 @@ import numpy as np
 import json
 from time import sleep
 from datetime import datetime
-
-class MessageListener:
-    def __init__(self, topic):
-import wave
-import speech_recognition as sr
-import logging
-from threading import Thread
-import paho.mqtt.client as mqtt
-from playsound import playsound
-import pyaudio
-import numpy as np
-import json
-from time import sleep
-from datetime import datetime
+from datetime import timedelta
 
 class MessageListener:
     def __init__(self, topic):
@@ -38,27 +25,19 @@ class MessageListener:
         self.fs = 44100
         self.chunk = 256
 
-        # Received messages
-        self.messages = []
-        self.sending_user = ""
-        self.initial_mes_time = ""
-        self.mes_number = 0
+        # Currently received message
+        self.message = {}
 
         # Setup
         self.setup_logging()
-        self.setup_mqtt
+        self.setup_mqtt()
         self.p = pyaudio.PyAudio()
-        self.recognizer = sr.Recognizer() # speech recognizer
-
-        # Save loop
-        thread = Thread(target=self.save_loop)
-        thread.start()
 
     def setup_logging(self):
         logging.basicConfig(format='%(asctime)s %(message)s',
-                                filename= "Log " + datetime.now().strftime("%H:%M:%S") + ".txt",
-                                filemode='w',
-                                level=logging.DEBUG)
+                            filename= "Log " + datetime.now().strftime("%H:%M:%S") + ".txt",
+                            filemode='w',
+                            level=logging.DEBUG)
 
     def setup_mqtt(self):
         client = mqtt.Client()
@@ -73,174 +52,59 @@ class MessageListener:
             # Parse json
             data_in = json.loads(msg.payload)
 
-            # Add new packets to:
-
             # Existing message
-            if (data_in["user"] == self.sending_user) and \
-            (data_in["time"] == self.initial_mes_time):
+            if (data_in["id"] == self.message.get("id")) and \
+            (data_in["first_packet_time"] == self.message.get("first_packet_time")):
 
-                self.messages[self.mes_number]["msg_chunk_list"] = \
-                    self.messages[self.mes_number]["msg_chunk_list"] + \
+                self.message["audio"] = \
+                    self.message["audio"] + \
                     "".join(data_in["audio"])
-
-                self.mes_number += 1
-
+                
+                # Save if last packet
+                if data_in.get("type") == "bye":
+                    audio_filename = self.save_audio_msg() # audio
+                    self.log_audio_as_text(audio_filename) # text
+                    print("hi")
             # New message
             else:
+                print("lol")
 
-                self.messages.append({
-                    "user" : data_in["user"],
-                    "time" : data_in["time"],
-                    "msg_chunk_list" : "".join(data_in["msg_chunk_list"]),
-                })
-
-                self.sending_user = data_in["user"]
-                self.initial_mes_time = data_in["time"]
-                self.mes_number = 1
+                # Add new message
+                self.message = data_in
+                self.message["audio"] = "".join(self.message["audio"]) # list to string
 
         except ValueError:
             pass
 
-    def save_loop(self):
-        while 1:
-            if self.messages:
-                for i in range(len(self.messages)):
-                    if datetime.strptime(self.messages[i], "%Y-%m-%d %H:%M:%S.%f") 
-                    self.log_audio_as_text(self.messages[i])
-                    self.save_audio_msg(self.messages[i])
-                
-                self.messages = []
-
-            sleep(5)
-
-    def log_audio_as_text(self, message):
-       
-        # Open
-        audio_file = sr.AudioFile(bytes.fromhex(message["msg_chunk_list"]))
-
-        with audio_file as source:
-            rec_audio = self.recognizer.record(source)
-
-        # Interpret
-        interpretation = self.recognizer.recognize_google(rec_audio)
-
-        # Log
-        logging.info("{} {}:\n{}\n".format(message["time"], message["user"], interpretation))
-
-    def save_audio_msg(self, message):
-        wf = wave.open("Audio {}: {}".format(message["time"], message["user"]), 'wb')
+    # Save audio and return its filename
+    def save_audio_msg(self):
+        filename = "Audio {}: {}".format(self.message["first_packet_time"], self.message["id"])
+        print("SAVING")
+        wf = wave.open(filename, 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(pyaudio.get_sample_size(self.sample_format))
         wf.setframerate(self.fs)
-        wf.writeframes(bytes.fromhex(message))
+        wf.writeframes(bytes.fromhex(self.message["audio"]))
         wf.close()
 
-ml = MessageListener("1")
-        # MQTT settings
-        self.broker = "mqtt.item.ntnu.no"
-        self.port = 1883
-        self.topic = topic
+        return filename
 
-        # Audio settings
-        self.channels = 1
-        self.sample_format = pyaudio.paInt16
-        self.fs = 44100
-        self.chunk = 256
+    def log_audio_as_text(self, filename): 
+        # Open
+        audio_file = sr.AudioFile(filename)
 
-        # Received messages
-        self.messages = []
-        self.sending_user = ""
-        self.initial_mes_time = ""
-        self.mes_number = 0
+        r = sr.Recognizer()
 
-        # Setup
-        self.setup_logging()
-        self.setup_mqtt
-        self.p = pyaudio.PyAudio()
-        self.recognizer = sr.Recognizer() # speech recognizer
+        with audio_file as source:
+            rec_audio = r.record(source)
 
-        # Save loop
-        thread = Thread(target=self.save_loop)
-        thread.start()
-
-    def setup_logging(self):
-        logging.basicConfig(format='%(asctime)s %(message)s',
-                                filename= "Log " + datetime.now().strftime("%H:%M:%S") + ".txt",
-                                filemode='w',
-                                level=logging.DEBUG)
-
-    def setup_mqtt(self):
-        client = mqtt.Client()
-        client.on_message = self.on_message
-        client.connect(self.broker, self.port)
-        client.subscribe(self.topic)
-        thread = Thread(target=client.loop_forever)
-        thread.start()
-
-    def on_message(self, client, userdata, msg):
+        # Interpret. Casts exeption for unintelligible sounds
         try:
-            # Parse json
-            data_in = json.loads(msg.payload)
-
-            # Add new packets to:
-
-            # Existing message
-            if (data_in["user"] == self.sending_user) and \
-            (data_in["time"] == self.initial_mes_time):
-
-                self.messages[self.mes_number]["msg_chunk_list"] = \
-                    self.messages[self.mes_number]["msg_chunk_list"] + \
-                    "".join(data_in["audio"])
-
-                self.mes_number += 1
-
-            # New message
-            else:
-
-                self.messages.append({
-                    "user" : data_in["user"],
-                    "time" : data_in["time"],
-                    "msg_chunk_list" : "".join(data_in["msg_chunk_list"]),
-                })
-
-                self.sending_user = data_in["user"]
-                self.initial_mes_time = data_in["time"]
-                self.mes_number = 1
-
-        except ValueError:
+            interpretation = r.recognize_google(rec_audio)
+        except sr.UnknownValueError:
             pass
 
-    def save_loop(self):
-        while 1:
-            if self.messages:
-                for i in range(len(self.messages)):
-                    self.log_audio_as_text(self.messages[i])
-                    self.save_audio_msg(self.messages[i])
-                
-                self.messages = []
-
-            sleep(5)
-
-    def log_audio_as_text(self, message):
-       
-        # Open
-        audio_file = sr.AudioFile(bytes.fromhex(message["msg_chunk_list"]))
-
-        with audio_file as source:
-            rec_audio = self.recognizer.record(source)
-
-        # Interpret
-        interpretation = self.recognizer.recognize_google(rec_audio)
-
         # Log
-        logging.info("{} {}:\n{}\n".format(message["time"], message["user"], interpretation))
+        logging.info("{} {}:\n{}\n".format(self.message["first_packet_time"], self.message["id"], interpretation))
 
-    def save_audio_msg(self, message):
-        wf = wave.open("Audio {}: {}".format(message["time"], message["user"]), 'wb')
-        wf.setnchannels(self.channels)
-        wf.setsampwidth(pyaudio.get_sample_size(self.sample_format))
-        wf.setframerate(self.fs)
-        wf.writeframes(bytes.fromhex(message))
-        wf.close()
-
-ml = MessageListener("1")
+ml = MessageListener("5")

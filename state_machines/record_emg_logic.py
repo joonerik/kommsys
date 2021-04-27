@@ -50,16 +50,24 @@ class RecorderEmergency:
         self.recording = True
 
         # Record loop
+        first_packet_time = datetime.now()
         while self.recording:
             audiochunks = []
 
             for i in range(10):
                 audiochunks.append(stream.read(self.chunk).hex())
             
-            now = datetime.now()
-            data_dict = {"id": self.id, "time": str(now), "audio": audiochunks}
+            data_dict = {"id": self.id, "first_packet_time": str(first_packet_time), "audio": audiochunks}
             
             self.client.publish("emg", json.dumps(data_dict))
+
+        # Last packet
+        data_dict = {"id": self.id, 
+                     "first_packet_time": str(first_packet_time), 
+                     "type" : "bye",
+                     "audio": "",}
+
+        self.client.publish("emg", json.dumps(data_dict))
         
         # Stop and close the stream
         stream.stop_stream()
