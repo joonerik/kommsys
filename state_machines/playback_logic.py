@@ -49,7 +49,7 @@ class Player:
         # play_audio(self.current_user, data_id, msg)
         # TODO: use play_audio function instead, as the logic is similar
         # TODO: fix logic where emg is prioritized
-        if (str(msg.topic) == "emg" and self.current_user == data_id):
+        if (str(msg.topic) == "emg"):
             data_id = (json.loads(msg.payload))["id"]
             self.current_user = data_id
 
