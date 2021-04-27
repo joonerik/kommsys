@@ -45,8 +45,42 @@ class Player:
         if (self.current_user == None):
             self.current_user = data_id
 
+        # play_audio(self.current_user, data_id, msg)
+
+        if (str(msg.topic) == "emg"):
+            if ((json.loads(msg.payload))["type"] == "bye"):
+                self.current_user == None
+            elif (str(self.id) != str(data_id) and self.current_user == data_id):
+                if not self.emg_mode:
+                    try:
+                        data = json.loads(msg.payload)
+                        audiochunks = data["audio"]
+                        for i in range(10):
+                            # TODO: check emg mode if ongoing receiving msg
+                            # while not self.emg_mode:
+                            self.player.write(bytes.fromhex(audiochunks[i]), 256)
+                    except ValueError:
+                        print("ValueError raised !!!")
+                        pass
+        else:
+            if ((json.loads(msg.payload))["type"] == "bye"):
+                self.current_user == None
+            elif (str(self.id) != str(data_id) and self.current_user == data_id):
+                if not self.emg_mode:
+                    try:
+                        data = json.loads(msg.payload)
+                        audiochunks = data["audio"]
+                        for i in range(10):
+                            # TODO: check emg mode if ongoing receiving msg
+                            # while not self.emg_mode:
+                            self.player.write(bytes.fromhex(audiochunks[i]), 256)
+                    except ValueError:
+                        print("ValueError raised !!!")
+                        pass 
+    
+    def play_audio(self, current_user, data_id, msg):
         if ((json.loads(msg.payload))["type"] == "bye"):
-            self.current_user == None
+                self.current_user == None
         elif (str(self.id) != str(data_id) and self.current_user == data_id):
             if not self.emg_mode:
                 try:
