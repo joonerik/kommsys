@@ -47,23 +47,24 @@ class Player:
             print("set to new user: " + str(self.current_user))
 
         # play_audio(self.current_user, data_id, msg)
-
+        # TODO: use play_audio function instead, as the logic is similar
+        # TODO: fix logic where emg is prioritized
         if (str(msg.topic) == "emg"):
-            if ((json.loads(msg.payload))["type"] == "bye"):
-                self.current_user = None
-                print("Current user: " + str(self.current_user))
-            elif (str(self.id) != str(data_id) and self.current_user == data_id):
-                if not self.emg_mode:
-                    try:
-                        data = json.loads(msg.payload)
-                        audiochunks = data["audio"]
-                        for i in range(10):
-                            # TODO: check emg mode if ongoing receiving msg
-                            # while not self.emg_mode:
-                            self.player.write(bytes.fromhex(audiochunks[i]), 256)
-                    except ValueError:
-                        print("ValueError raised !!!")
-                        pass
+            data_id = (json.loads(msg.payload))["id"]
+            self.current_user = data_id
+            # missing logic for having the channel occupied if multiple emg messages is played
+            if (str(self.id) != str(data_id) and self.current_user == data_id):
+                self.emg_mode = True
+                try:
+                    data = json.loads(msg.payload)
+                    audiochunks = data["audio"]
+                    for i in range(10):
+                        # TODO: check emg mode if ongoing receiving msg
+                        # while not self.emg_mode:
+                        self.player.write(bytes.fromhex(audiochunks[i]), 256)
+                except ValueError:
+                    print("ValueError raised !!!")
+                    pass
         else:
             if ((json.loads(msg.payload))["type"] == "bye"):
                 self.current_user = None
@@ -111,8 +112,6 @@ class Player:
         t0 = {'source': 'initial', 'target': 'ready'}
         t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
         t7 = {'trigger': 'change_channel_signal', 'source': 'ready', 'target': 'ready', 'effect': 'change_channel'}
-        
-
 
         stm = Machine(name=name, transitions=[t0, t5, t7], obj=self)
         self.stm = stm
