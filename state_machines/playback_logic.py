@@ -44,14 +44,14 @@ class Player:
         data_id = (json.loads(msg.payload))["id"]
         if (self.current_user == None):
             self.current_user = data_id
-            print("set to new user")
+            print("set to new user: " + str(self.current_user))
 
         # play_audio(self.current_user, data_id, msg)
 
         if (str(msg.topic) == "emg"):
             if ((json.loads(msg.payload))["type"] == "bye"):
-                print("set to None")
                 self.current_user = None
+                print("Current user: " + str(self.current_user))
             elif (str(self.id) != str(data_id) and self.current_user == data_id):
                 if not self.emg_mode:
                     try:
@@ -66,8 +66,8 @@ class Player:
                         pass
         else:
             if ((json.loads(msg.payload))["type"] == "bye"):
-                print("set to None")
                 self.current_user = None
+                print("Current user: " + str(self.current_user))
             elif (str(self.id) != str(data_id) and self.current_user == data_id):
                 if not self.emg_mode:
                     try:

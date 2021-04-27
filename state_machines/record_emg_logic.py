@@ -72,7 +72,7 @@ class RecorderEmergency:
     def stop(self):
         self.recording = False
         topic = open("audio_files/channel.txt", "r").readline()
-        data_dict = {"id": self.id, "time": str(datetime.now), "type": "bye", "audio": ''}
+        data_dict = {"id": self.id, "time": str(datetime.now()), "type": "bye", "audio": ''}
         self.client.publish(topic, json.dumps(data_dict))
         self.stm.stop_timer('t')
 
