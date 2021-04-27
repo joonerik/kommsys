@@ -9,6 +9,8 @@ from threading import Thread
 from os import system
 import paho.mqtt.client as mqtt
 import time
+import socket
+from random import randint
 
 broker, port = "mqtt.item.ntnu.no", 1883
 
@@ -42,9 +44,11 @@ class GUI:
 
 
     def create_driver(self):
-        self.recorder = Recorder()
-        self.playback = Player()
-        self.recorder_emg = RecorderEmergency()
+        self.id = socket.gethostname() + str(randint(0,100))
+
+        self.recorder = Recorder(self.id)
+        self.playback = Player(self.id)
+        self.recorder_emg = RecorderEmergency(self.id)
 
         self.driver = stmpy.Driver()
         self.driver.add_machine(self.recorder.create_machine('recorder_stm'))
