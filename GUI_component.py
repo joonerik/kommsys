@@ -9,6 +9,7 @@ from threading import Thread
 from os import system
 import paho.mqtt.client as mqtt
 import time
+import socket
 
 broker, port = "mqtt.item.ntnu.no", 1883
 
