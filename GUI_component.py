@@ -47,14 +47,14 @@ class GUI:
         
         self.id = socket.gethostname() + str(randint(0,100))
 
-        recorder = Recorder(self.id)
-        playback = Player(self.id)
-        recorder_emg = RecorderEmergency(self.id)
+        self.recorder = Recorder(self.id)
+        self.playback = Player(self.id)
+        self.recorder_emg = RecorderEmergency(self.id)
 
         self.driver = stmpy.Driver()
-        self.driver.add_machine(recorder.create_machine('recorder_stm'))
-        self.driver.add_machine(playback.create_machine('playback_stm'))
-        self.driver.add_machine(recorder_emg.create_machine('recorder_emg_stm'))
+        self.driver.add_machine(self.recorder.create_machine('recorder_stm'))
+        self.driver.add_machine(self.playback.create_machine('playback_stm'))
+        self.driver.add_machine(self.recorder_emg.create_machine('recorder_emg_stm'))
         self.driver.start()
 
     def listening(self):
