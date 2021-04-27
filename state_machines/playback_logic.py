@@ -52,6 +52,9 @@ class Player:
         if (str(msg.topic) == "emg"):
             data_id = (json.loads(msg.payload))["id"]
             self.current_user = data_id
+            if ((json.loads(msg.payload))["type"] == "bye"):
+                self.current_user = None
+                self.emg_mode = False
             # missing logic for having the channel occupied if multiple emg messages is played
             if (str(self.id) != str(data_id) and self.current_user == data_id):
                 self.emg_mode = True
@@ -69,8 +72,11 @@ class Player:
             if ((json.loads(msg.payload))["type"] == "bye"):
                 self.current_user = None
                 print("Current user: " + str(self.current_user))
+                print("only here once")
             elif (str(self.id) != str(data_id) and self.current_user == data_id):
+                print("inside elif")
                 if not self.emg_mode:
+                    print("soon player write")
                     try:
                         data = json.loads(msg.payload)
                         audiochunks = data["audio"]
