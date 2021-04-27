@@ -22,7 +22,8 @@ class Player:
         self.client.subscribe("emg")
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
-        self.id = id
+        self.id = id 
+        self.current_user = None
 
         self.p = pyaudio.PyAudio()
         self.player = self.p.open(format=pyaudio.paInt16, 
@@ -40,7 +41,13 @@ class Player:
 
     def on_message(self, client, userdata, msg):
         data_id = (json.loads(msg.payload))["id"]
-        if str(self.id) != str(data_id):
+
+        if (self.current_user == None):
+            self.current_user = data_id
+
+        if ((json.loads(msg.payload))["type"] == "bye"):
+            self.current_user == None
+        elif (str(self.id) != str(data_id) and self.current_user == data_id):
             if not self.emg_mode:
                 try:
                     data = json.loads(msg.payload)
@@ -52,6 +59,7 @@ class Player:
                 except ValueError:
                     print("ValueError raised !!!")
                     pass
+
         
     def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
