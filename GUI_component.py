@@ -114,7 +114,7 @@ class GUI:
 
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
+        #self.client.on_message = self.on_message
         print("Connecting to {}:{}".format(broker, port))
         self.client.connect(broker, port)
 
@@ -166,21 +166,21 @@ class GUI:
         print("on_connect(): {}".format(mqtt.connack_string(rc)))
 
     #klarer ikke motta meldinger når det kommer fra emergency stm.
-    def on_message(self, client, userdata, msg):
+    """def on_message(self, client, userdata, msg):
         print(self.playback.stm.state)
         print("on_message(): topic: {}".format(msg.topic))
         print(self.playback.emg_mode)
-        """if self.recorder_emg.playing:
-            self.emg_listening()"""
-        if msg.topic == "emg":
-            self.change_channel("emg")
+        if self.recorder_emg.playing:
             self.emg_listening()
-            self.change_channel(self.channel_number)
-        else:
-            self.channel_number = open("audio_files/channel.txt", "r").readline()
-            self.change_channel(self.channel_number)
-            self.listening()
-            print(self.playback.stm.state)
+        #if msg.topic == "emg":
+         #   self.change_channel("emg")
+            #self.emg_listening()
+          #  self.change_channel(self.channel_number)
+        #else:
+        self.channel_number = open("audio_files/channel.txt", "r").readline()
+        self.change_channel(self.channel_number)
+        #self.listening()
+        print(self.playback.stm.state)"""
 
 
 
