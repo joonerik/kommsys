@@ -67,7 +67,8 @@ class Recorder:
             stream.close()
 
             # Terminate the PortAudio interface
-            self.p.terminate()
+            # avoid terminates because of OSError 9996 - no default device
+            # self.p.terminate()
         else:
             print("Emergency mode ON - can't start recording")
         
