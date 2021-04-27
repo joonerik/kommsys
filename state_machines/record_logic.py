@@ -58,7 +58,7 @@ class Recorder:
                     audiochunks.append(stream.read(self.chunk).hex())
                 
                 now = datetime.now()
-                data_dict = {"id": self.id, "time": now, "audio": audiochunks}
+                data_dict = {"id": self.id, "time": str(now), "audio": audiochunks}
                 
                 self.client.publish(topic, json.dumps(data_dict))
             
