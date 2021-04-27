@@ -50,10 +50,12 @@ class Player:
         # play_audio(self.current_user, data_id, msg)
         # TODO: use play_audio function instead, as the logic is similar
         # TODO: fix logic where emg is prioritized
-        if (str(msg.topic) == "emg" and self.current_user == data_id):
-            data_id = (json.loads(msg.payload))["id"]
+        if (str(msg.topic) == "emg"):
+            #data_id = (json.loads(msg.payload))["id"]
+            self.current_user = data_id
             self.emergency.append(self.current_user)
-            self.current_user = self.emergency[0]
+            #self.currenent_user = self.emergency[0]
+            
 
             if ((json.loads(msg.payload))["type"] == "bye"):
                 self.current_user = None
