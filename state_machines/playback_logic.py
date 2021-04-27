@@ -6,11 +6,13 @@ import paho.mqtt.client as mqtt
 import os
 import pyaudio
 import wave
+import json
 
 broker, port = "mqtt.item.ntnu.no", 1883
+
         
 class Player:
-    def __init__(self):
+    def __init__(self, id):
         self.client = mqtt.Client()
         self.client.on_message = self.on_message
         self.client.connect(broker, port)
@@ -20,6 +22,14 @@ class Player:
         self.client.subscribe("emg")
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
+        self.id = id
+
+        self.p = pyaudio.PyAudio()
+        self.player = self.p.open(format=pyaudio.paInt16, 
+                        channels=1, 
+                        rate=44100, 
+                        frames_per_buffer = 256,
+                        output=True)
 
         try:
             thread = Thread(target=self.client.loop_forever)
@@ -29,49 +39,20 @@ class Player:
             self.client.disconnect()
 
     def on_message(self, client, userdata, msg):
-        print("on_message(): topic: {}".format(msg.topic))
-        f = open(self.filename, 'wb')
-        f.write(msg.payload)
-        f.close()
-
-        reduce_noise(self.filename)
-        self.stm.send("start")
+        data_id = (json.loads(msg.payload))["id"]
+        if str(self.id) != str(data_id):
+            if not self.emg_mode:
+                try:
+                    data = json.loads(msg.payload)
+                    audiochunks = data["audio"]
+                    for i in range(10):
+                        # TODO: check emg mode if ongoing receiving msg
+                        # while not self.emg_mode:
+                        self.player.write(bytes.fromhex(audiochunks[i]), 256)
+                except ValueError:
+                    print("ValueError raised !!!")
+                    pass
         
-    def play(self):
-        if not self.emg_mode:
-            # Set chunk size of 1024 samples per data frame
-            chunk = 1024  
-
-            # Open the sound file 
-            wf = wave.open(self.filename, 'rb')
-
-            # Create an interface to PortAudio
-            p = pyaudio.PyAudio()
-
-            # Open a .Stream object to write the WAV file to
-            # 'output = True' indicates that the sound will be played rather than recorded
-            stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
-                            channels = wf.getnchannels(),
-                            rate = wf.getframerate(),
-                            output = True)
-
-            # Read data in chunks
-            data = wf.readframes(chunk)
-            # Play the sound by writing the audio data to the stream
-            while data != (b'') and not self.emg_mode:
-                stream.write(data)
-                data = wf.readframes(chunk)
-
-            # Close and terminate the stream
-            print("Message is finished")
-            stream.close()
-            p.terminate()
-        else:
-            # TODO: Test if an incoming message on a channel subscribed is ignored if a emg msg is playing
-            # Remember to argue for this in the systemSpec. It is also not likely that a person is
-            # sending a msg while an emg msg is played
-            print("Emergency mode ON - can't play incoming message")
-
     def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
         print("Emergency mode switched to: " + str(self.emg_mode) + " in playback_stm")
@@ -83,16 +64,11 @@ class Player:
 
     def create_machine(self, name):
         t0 = {'source': 'initial', 'target': 'ready'}
-        t1 = {'trigger': 'start', 'source': 'ready', 'target': 'playing'}
-        t2 = {'trigger': 'done', 'source': 'playing', 'target': 'ready'}
-        t8 = {'trigger': 'abort', 'source': 'playing', 'target': 'ready'}
         t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
-        t6 = {'trigger': 'emg_msg', 'source': 'playing', 'target': 'ready', 'effect': 'switch_emg_mode'}
         t7 = {'trigger': 'change_channel_signal', 'source': 'ready', 'target': 'ready', 'effect': 'change_channel'}
         
-        s_playing = {'name': 'playing', 'do': 'play()'}
 
 
-        stm = Machine(name=name, transitions=[t0, t1, t2, t5, t6, t7, t8], states=[s_playing], obj=self)
+        stm = Machine(name=name, transitions=[t0, t5, t7], obj=self)
         self.stm = stm
         return self.stm
