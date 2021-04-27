@@ -49,14 +49,16 @@ class Player:
         # play_audio(self.current_user, data_id, msg)
         # TODO: use play_audio function instead, as the logic is similar
         # TODO: fix logic where emg is prioritized
-        if (str(msg.topic) == "emg"):
+        if (str(msg.topic) == "emg" and self.current_user == data_id):
             data_id = (json.loads(msg.payload))["id"]
             self.current_user = data_id
+
             if ((json.loads(msg.payload))["type"] == "bye"):
                 self.current_user = None
                 self.emg_mode = False
+
             # missing logic for having the channel occupied if multiple emg messages is played
-            if (str(self.id) != str(data_id) and self.current_user == data_id):
+            elif (str(self.id) != str(data_id) and self.current_user == data_id):
                 self.emg_mode = True
                 try:
                     data = json.loads(msg.payload)
