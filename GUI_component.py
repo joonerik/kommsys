@@ -18,7 +18,7 @@ class GUI:
 
     def count(self,t):
 
-        while t < 3:
+        while t < 60:
             mins, secs = divmod(t, 60)
             timer = '{:02d}:{:02d}'.format(mins, secs)
             print(timer, end="\r")
@@ -26,25 +26,21 @@ class GUI:
             t += 1
             print(t)
             self.update()
+            if self.playback.stm.state == "ready":
+                break
+
 
     def update(self):
         state = self.playback.stm.state
-        state2 = self.recorder_emg.stm.state
-        print(state)
-        print(state2)
-        if state2 == "s_processing":
-            self.emg_listening()
-        if state == "playing":
-            self.listening()
+        #print(state)
         if state == "ready":
             self.app.setImage("show", "img/idle2.png")
-            print("hello")
+            #print("hello")
             self.app.setImageMap("show", self.click, self.coords)
 
 
 
     def create_driver(self):
-        
         self.id = socket.gethostname() + str(randint(0,100))
 
         self.recorder = Recorder(self.id)
@@ -125,6 +121,7 @@ class GUI:
         self.app = gui()
         self.channel_number = open("audio_files/channel.txt", "r").readline()
         self.client.subscribe(self.channel_number)
+        self.client.subscribe("emg")
         self.channelEdit = False
         self.isRecording = False
         self.isEmg = False
@@ -173,9 +170,15 @@ class GUI:
         print(self.playback.stm.state)
         print("on_message(): topic: {}".format(msg.topic))
         print(self.playback.emg_mode)
-        if self.recorder_emg.playing:
+        """if self.recorder_emg.playing:
+            self.emg_listening()"""
+        if msg.topic == "emg":
+            self.change_channel("emg")
             self.emg_listening()
+            self.change_channel(self.channel_number)
         else:
+            self.channel_number = open("audio_files/channel.txt", "r").readline()
+            self.change_channel(self.channel_number)
             self.listening()
             print(self.playback.stm.state)
 
@@ -208,7 +211,7 @@ class GUI:
                 self.channelEdit = False
                 self.app.setLabel("channelnow", "Current channel: " + self.channel_number)
                 self.change_channel(self.channel_number)
-                self.channel_number = "" 
+                self.channel_number = ""
         self.app.go()
 
     def create_gui(self):
