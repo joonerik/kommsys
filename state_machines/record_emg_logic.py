@@ -7,6 +7,7 @@ import pyaudio
 import wave
 import uuid
 import json
+import time
 from datetime import datetime
 
 broker, port = "mqtt.item.ntnu.no", 1883
@@ -57,7 +58,7 @@ class RecorderEmergency:
                 audiochunks.append(stream.read(self.chunk).hex())
             
             now = datetime.now()
-            data_dict = {"id": self.id, "time": str(now), "audio": audiochunks}
+            data_dict = {"id": self.id, "time": str(now), "type": "data", "audio": audiochunks}
             
             self.client.publish("emg", json.dumps(data_dict))
         
@@ -71,6 +72,9 @@ class RecorderEmergency:
         
     def stop(self):
         self.recording = False
+        time.sleep(0.1)
+        data_dict = {"id": self.id, "time": str(datetime.now()), "type": "bye", "audio": ''}
+        self.client.publish("emg", json.dumps(data_dict))
         self.stm.stop_timer('t')
 
     def timeout(self):
