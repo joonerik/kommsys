@@ -35,7 +35,6 @@ class MessageListener:
         self.setup_logging()
         self.setup_mqtt()
         self.p = pyaudio.PyAudio()
-        self.recognizer = sr.Recognizer() # speech recognizer
 
         # Save loop
         thread = Thread(target=self.save_loop)
@@ -120,13 +119,15 @@ class MessageListener:
         # Open
         audio_file = sr.AudioFile(filename)
         print("2")   
-
+        r = sr.Recognizer()
+        print("2.5")
         with audio_file as source:
-            rec_audio = self.recognizer.record(source)
+            rec_audio = r.record(source)
         print("3")   
-
+        print(type(rec_audio))
+        print(rec_audio)
         # Interpret
-        interpretation = self.recognizer.recognize_google(rec_audio)
+        interpretation = r.recognize_google(rec_audio)
         print("4")   
 
         # Log
