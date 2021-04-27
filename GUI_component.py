@@ -7,12 +7,9 @@ from state_machines.playback_logic import Player
 from state_machines.record_emg_logic import RecorderEmergency
 from threading import Thread
 from os import system
-import paho.mqtt.client as mqtt
 import time
 import socket
 from random import randint
-
-broker, port = "mqtt.item.ntnu.no", 1883
 
 class GUI:
 
@@ -112,16 +109,8 @@ class GUI:
 
     def __init__(self):
 
-        self.client = mqtt.Client()
-        self.client.on_connect = self.on_connect
-        #self.client.on_message = self.on_message
-        print("Connecting to {}:{}".format(broker, port))
-        self.client.connect(broker, port)
-
         self.app = gui()
         self.channel_number = open("audio_files/channel.txt", "r").readline()
-        self.client.subscribe(self.channel_number)
-        self.client.subscribe("emg")
         self.channelEdit = False
         self.isRecording = False
         self.isEmg = False
@@ -153,35 +142,6 @@ class GUI:
         self.driver = stmpy.Driver()
         self.driver.start(keep_active=True)
         self.create_driver()
-
-
-        try:
-            thread = Thread(target=self.client.loop_forever)
-            thread.start()
-        except KeyboardInterrupt:
-            print("Interrupted")
-            self.client.disconnect()
-
-    def on_connect(self, client, userdata, flags, rc):
-        print("on_connect(): {}".format(mqtt.connack_string(rc)))
-
-    #klarer ikke motta meldinger når det kommer fra emergency stm.
-    """def on_message(self, client, userdata, msg):
-        print(self.playback.stm.state)
-        print("on_message(): topic: {}".format(msg.topic))
-        print(self.playback.emg_mode)
-        if self.recorder_emg.playing:
-            self.emg_listening()
-        #if msg.topic == "emg":
-         #   self.change_channel("emg")
-            #self.emg_listening()
-          #  self.change_channel(self.channel_number)
-        #else:
-        self.channel_number = open("audio_files/channel.txt", "r").readline()
-        self.change_channel(self.channel_number)
-        #self.listening()
-        print(self.playback.stm.state)"""
-
 
 
     def click(self, area):
@@ -218,7 +178,6 @@ class GUI:
 
         self.app.setFont(16)
         self.app.startLabelFrame('Info:', 0,2)
-        #self.app.addButton('Release emg record', self.stop_recording_emg)
         self.app.addLabel("channelnow", "Current channel: " + self.channel_number)
         self.channel_number = ""
         self.app.stopLabelFrame()
