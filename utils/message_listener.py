@@ -25,20 +25,13 @@ class MessageListener:
         self.fs = 44100
         self.chunk = 256
 
-        # Received messages
-        self.messages = []
-        self.sending_id = ""
-        self.first_msg_time = ""
-        self.mes_number = 0
+        # Currently received message
+        self.message = {}
 
         # Setup
         self.setup_logging()
         self.setup_mqtt()
         self.p = pyaudio.PyAudio()
-
-        # Save loop
-        thread = Thread(target=self.save_loop)
-        thread.start()
 
     def setup_logging(self):
         logging.basicConfig(format='%(asctime)s %(message)s',
@@ -47,8 +40,6 @@ class MessageListener:
                             level=logging.DEBUG)
 
     def setup_mqtt(self):
-        print("hi")
-
         client = mqtt.Client()
         client.on_message = self.on_message
         client.connect(self.broker, self.port)
@@ -61,65 +52,51 @@ class MessageListener:
             # Parse json
             data_in = json.loads(msg.payload)
 
-            # Add new packets to:
-
             # Existing message
-            if (data_in["id"] == self.sending_id) and \
-            (data_in["first_msg_time"] == self.first_msg_time):
+            if (data_in["id"] == self.message.get("id")) and \
+            (data_in["first_packet_time"] == self.message.get("first_packet_time")):
 
-                self.messages[0]["msg_chunk_list"] = \
-                    self.messages[0]["msg_chunk_list"] + \
+                self.message["audio"] = \
+                    self.message["audio"] + \
                     "".join(data_in["audio"])
-
+                
+                # Save if last packet
+                if data_in.get("type") == "bye":
+                    audio_filename = self.save_audio_msg() # audio
+                    self.log_audio_as_text(audio_filename) # text
+                    print("hi")
             # New message
             else:
-                # Add new message
-                self.messages.insert(0, {
-                    "id" : data_in["id"],
-                    "first_msg_time" : data_in["first_msg_time"],
-                    "msg_chunk_list" : "".join(data_in["audio"]),
-                })
+                print("lol")
 
-                self.sending_id = data_in["id"]
-                self.first_msg_time = data_in["first_msg_time"]
-                self.mes_number = 1
+                # Add new message
+                self.message = data_in
+                self.message["audio"] = "".join(self.message["audio"]) # list to string
 
         except ValueError:
             pass
 
-    def save_loop(self):
-        while 1:
-            if self.messages:
-                for i in range(len(self.messages)):
-                    time_since_first_msg = datetime.now() - datetime.strptime(self.messages[i]["first_msg_time"], "%Y-%m-%d %H:%M:%S.%f")
-
-                    # Save audio and speech log for messages older than 30 seconds
-                    if time_since_first_msg > timedelta(seconds=31):
-                        audio_filename = self.save_audio_msg(self.messages[i])
-                        self.log_audio_as_text(self.messages[i], audio_filename)
-
-                        # Delete message
-                        del self.messages[i]
-
-            sleep(5)
-
     # Save audio and return its filename
-    def save_audio_msg(self, message):
-        filename = "Audio {}: {}".format(message["first_msg_time"], message["id"])
+    def save_audio_msg(self):
+        filename = "Audio {}: {}".format(self.message["first_packet_time"], self.message["id"])
+        print("SAVING")
         wf = wave.open(filename, 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(pyaudio.get_sample_size(self.sample_format))
         wf.setframerate(self.fs)
-        wf.writeframes(bytes.fromhex(message["msg_chunk_list"]))
+        wf.writeframes(bytes.fromhex(self.message["audio"]))
         wf.close()
+
         return filename
 
-    def log_audio_as_text(self, message, filename): 
+    def log_audio_as_text(self, filename): 
         # Open
         audio_file = sr.AudioFile(filename)
 
+        r = sr.Recognizer()
+
         with audio_file as source:
-            rec_audio = sr.Recognizer().record(source)
+            rec_audio = r.record(source)
 
         # Interpret. Casts exeption for unintelligible sounds
         try:
@@ -128,6 +105,6 @@ class MessageListener:
             pass
 
         # Log
-        logging.info("{} {}:\n{}\n".format(message["first_msg_time"], message["id"], interpretation))
+        logging.info("{} {}:\n{}\n".format(self.message["first_packet_time"], self.message["id"], interpretation))
 
 ml = MessageListener("5")
