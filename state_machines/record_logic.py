@@ -76,7 +76,7 @@ class Recorder:
         self.recording = False
         topic = open("audio_files/channel.txt", "r").readline()
         data_dict = {"id": self.id, "time": str(datetime.now), "type": "bye", "audio": ''}
-        self.client.publish(topic, json.dumps({"type": "stop"}))
+        self.client.publish(topic, json.dumps(data_dict))
         self.stm.stop_timer('t')
 
     def timeout(self):
