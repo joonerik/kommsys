@@ -64,11 +64,8 @@ class MessageListener:
                 if data_in.get("type") == "bye":
                     audio_filename = self.save_audio_msg() # audio
                     self.log_audio_as_text(audio_filename) # text
-                    print("hi")
             # New message
             else:
-                print("lol")
-
                 # Add new message
                 self.message = data_in
                 self.message["audio"] = "".join(self.message["audio"]) # list to string
@@ -79,7 +76,6 @@ class MessageListener:
     # Save audio and return its filename
     def save_audio_msg(self):
         filename = "Audio {}: {}".format(self.message["first_packet_time"], self.message["id"])
-        print("SAVING")
         wf = wave.open(filename, 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(pyaudio.get_sample_size(self.sample_format))
