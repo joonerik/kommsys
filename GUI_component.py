@@ -42,9 +42,12 @@ class GUI:
 
 
     def create_driver(self):
-        self.recorder = Recorder()
-        self.playback = Player()
-        self.recorder_emg = RecorderEmergency()
+        
+        self.id = socket.gethostname() + str(randint(0,100))
+
+        recorder = Recorder(self.id)
+        playback = Player(self.id)
+        recorder_emg = RecorderEmergency(self.id)
 
         self.driver = stmpy.Driver()
         self.driver.add_machine(self.recorder.create_machine('recorder_stm'))
