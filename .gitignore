@@ -270,3 +270,4 @@ Thumbs.db
 # ignore audio files and txt
 *.txt
 *.wav
+!requirements.txt
