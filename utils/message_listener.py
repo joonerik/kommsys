@@ -35,7 +35,7 @@ class MessageListener:
 
     def setup_logging(self):
         logging.basicConfig(format='%(asctime)s %(message)s',
-                            filename= "Log " + datetime.now().strftime("%H:%M:%S") + ".txt",
+                            filename= "log_files/" + "Log_" + datetime.now().strftime("%H:%M:%S") + ".txt",
                             filemode='w',
                             level=logging.DEBUG)
 
@@ -75,8 +75,8 @@ class MessageListener:
 
     # Save audio and return its filename
     def save_audio_msg(self):
-        filename = "Audio {}: {}".format(self.message["first_packet_time"], self.message["id"])
-        wf = wave.open(filename, 'wb')
+        filename = "Audio {}: {}.wav".format(self.message["first_packet_time"], self.message["id"])
+        wf = wave.open("audio_files/input_audio/" + filename, 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(pyaudio.get_sample_size(self.sample_format))
         wf.setframerate(self.fs)
@@ -87,7 +87,7 @@ class MessageListener:
 
     def log_audio_as_text(self, filename): 
         # Open
-        audio_file = sr.AudioFile(filename)
+        audio_file = sr.AudioFile("audio_files/input_audio/" + filename)
 
         r = sr.Recognizer()
 
@@ -103,4 +103,4 @@ class MessageListener:
         # Log
         logging.info("{} {}:\n{}\n".format(self.message["first_packet_time"], self.message["id"], interpretation))
 
-ml = MessageListener("5")
+ml = MessageListener("team13/")
