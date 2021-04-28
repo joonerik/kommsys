@@ -32,7 +32,6 @@ class Player:
                         rate=44100, 
                         frames_per_buffer = 256,
                         output=True)
-
         try:
             thread = Thread(target=self.client.loop_forever)
             thread.start()
@@ -41,15 +40,11 @@ class Player:
             self.client.disconnect()
 
     def on_message(self, client, userdata, msg):
-
         data_id = (json.loads(msg.payload))["id"]
         if (self.current_user == None):
             self.current_user = data_id
             print("set to new user: " + str(self.current_user))
 
-        # play_audio(self.current_user, data_id, msg)
-        # TODO: use play_audio function instead, as the logic is similar
-        # TODO: fix logic where emg is prioritized
         if (str(msg.topic) == "team13/emg"):
             self.current_user = data_id
             if (len(self.emergency) < 1):
@@ -61,19 +56,17 @@ class Player:
                 self.emg_mode = False
                 self.emergency = []
 
-            # missing logic for having the channel occupied if multiple emg messages is played
             elif (str(self.id) != str(data_id) and self.current_user == self.emergency[0]):
                 self.emg_mode = True
                 try:
                     data = json.loads(msg.payload)
                     audiochunks = data["audio"]
                     for i in range(10):
-                        # TODO: check emg mode if ongoing receiving msg
-                        # while not self.emg_mode:
                         self.player.write(bytes.fromhex(audiochunks[i]), 256)
                 except ValueError:
                     print("ValueError raised !!!")
                     pass
+        
         else:
             if ((json.loads(msg.payload))["type"] == "bye"):
                 self.current_user = None
@@ -87,8 +80,6 @@ class Player:
                         data = json.loads(msg.payload)
                         audiochunks = data["audio"]
                         for i in range(10):
-                            # TODO: check emg mode if ongoing receiving msg
-                            # while not self.emg_mode:
                             self.player.write(bytes.fromhex(audiochunks[i]), 256)
                     except ValueError:
                         print("ValueError raised !!!")
@@ -103,8 +94,6 @@ class Player:
                     data = json.loads(msg.payload)
                     audiochunks = data["audio"]
                     for i in range(10):
-                        # TODO: check emg mode if ongoing receiving msg
-                        # while not self.emg_mode:
                         self.player.write(bytes.fromhex(audiochunks[i]), 256)
                 except ValueError:
                     print("ValueError raised !!!")

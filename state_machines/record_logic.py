@@ -16,10 +16,10 @@ class Recorder:
         self.start(broker, port)
         self.recording = False
         self.emg_mode = False
-        self.chunk = 256  # Record in chunks of 1024 samples
-        self.sample_format = pyaudio.paInt16  # 16 bits per sample
+        self.chunk = 256  
+        self.sample_format = pyaudio.paInt16 
         self.channels = 1
-        self.fs = 44100  # Record at 44100 samples per second
+        self.fs = 44100 
         self.filename = "audio_files/input_audio/" + str(uuid.uuid4()) + ".wav"
         self.p = pyaudio.PyAudio()
         self.id = id
@@ -47,7 +47,6 @@ class Recorder:
                              rate=44100,   # Record at 44100 samples per second
                              frames_per_buffer=self.chunk,   # Record in chunks
                              input=True)
-        
             self.recording = True
 
             # Record loop
@@ -55,7 +54,6 @@ class Recorder:
             first_packet_time = datetime.now()
             while self.recording:
                 audiochunks = []
-
                 for i in range(10):
                     audiochunks.append(stream.read(self.chunk).hex())
                 
@@ -75,18 +73,12 @@ class Recorder:
             stream.stop_stream()
             stream.close()
 
-            # Terminate the PortAudio interface
-            # avoid terminates because of OSError 9996 - no default device
-            # self.p.terminate()
         else:
             print("Emergency mode ON - can't start recording")
         
     def stop(self):
         self.recording = False
         time.sleep(0.1)
-        # topic = open("audio_files/channel.txt", "r").readline()
-        # data_dict = {"id": self.id, "time": str(datetime.now()), "type": "bye", "audio": ''}
-        # self.client.publish(topic, json.dumps(data_dict))
         self.stm.stop_timer('t')
 
     def timeout(self):

@@ -16,11 +16,10 @@ class RecorderEmergency:
     def __init__(self, id):
         self.start(broker, port)
         self.recording = False
-        # self.emg_mode = False
-        self.chunk = 256  # Record in chunks of 1024 samples
-        self.sample_format = pyaudio.paInt16  # 16 bits per sample
+        self.chunk = 256
+        self.sample_format = pyaudio.paInt16
         self.channels = 1
-        self.fs = 44100  # Record at 44100 samples per second
+        self.fs = 44100 
         self.filename = "audio_files/input_audio/" + "emergency" + ".wav"
         self.p = pyaudio.PyAudio()
         self.id = id
@@ -47,14 +46,13 @@ class RecorderEmergency:
                              rate=44100,   # Record at 44100 samples per second
                              frames_per_buffer=self.chunk,   # Record in chunks
                              input=True)
-        
         self.recording = True
 
         # Record loop
         first_packet_time = datetime.now()
         while self.recording:
             audiochunks = []
-
+            
             for i in range(10):
                 audiochunks.append(stream.read(self.chunk).hex())
             
@@ -76,9 +74,6 @@ class RecorderEmergency:
         
     def stop(self):
         self.recording = False
-        # time.sleep(0.1)
-        # data_dict = {"id": self.id, "time": str(datetime.now()), "type": "bye", "audio": ''}
-        # self.client.publish("emg", json.dumps(data_dict))
         self.stm.stop_timer('t')
 
     def timeout(self):
