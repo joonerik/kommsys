@@ -16,7 +16,7 @@ class Player:
         self.client = mqtt.Client()
         self.client.on_message = self.on_message
         self.client.connect(broker, port)
-        self.channel = open("audio_files/channel.txt", "r").readline()
+        self.channel = "team13/" + open("audio_files/channel.txt", "r").readline()
         # TODO: We have to make sure that the on_message (callback?) for 'emg'-channel is prioritized
         self.client.subscribe(self.channel)
         self.client.subscribe("emg")
@@ -117,7 +117,7 @@ class Player:
 
     def change_channel(self):
         self.client.unsubscribe(self.channel)
-        self.channel = open("audio_files/channel.txt", "r").readline()
+        self.channel = "team13/" + open("audio_files/channel.txt", "r").readline()
         self.client.subscribe(self.channel)
 
     def create_machine(self, name):
