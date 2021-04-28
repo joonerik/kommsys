@@ -58,7 +58,7 @@ class RecorderEmergency:
             for i in range(10):
                 audiochunks.append(stream.read(self.chunk).hex())
             
-            data_dict = {"id": self.id, "first_packet_time": str(first_packet_time), "type": "data", "audio": audiochunks}
+            data_dict = {"id": self.id, "first_packet_time": str(first_packet_time), "audio": audiochunks}
             
             self.client.publish("team13/emg", json.dumps(data_dict))
 
@@ -80,6 +80,9 @@ class RecorderEmergency:
         
     def stop(self):
         self.recording = False
+        # time.sleep(0.1)
+        # data_dict = {"id": self.id, "time": str(datetime.now()), "type": "bye", "audio": ''}
+        # self.client.publish("emg", json.dumps(data_dict))
         self.stm.stop_timer('t')
 
     def timeout(self):
