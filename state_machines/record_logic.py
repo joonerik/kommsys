@@ -51,7 +51,7 @@ class Recorder:
             self.recording = True
 
             # Record loop
-            topic = open("audio_files/channel.txt", "r").readline()
+            topic = "team13/" + open("audio_files/channel.txt", "r").readline()
             first_packet_time = datetime.now()
             while self.recording:
                 audiochunks = []
