@@ -68,7 +68,7 @@ class RecorderEmergency:
                      "type" : "bye",
                      "audio": ""}
 
-        self.client.publish("emg", json.dumps(data_dict))
+        self.client.publish("team13/emg", json.dumps(data_dict))
         
         # Stop and close the stream
         stream.stop_stream()
