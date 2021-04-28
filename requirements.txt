@@ -1,0 +1,10 @@
+sounddevice==0.4.1
+numpy==1.19.2
+SpeechRecognition==3.8.1
+scipy==1.6.2
+playsound==1.2.2
+stmpy==0.7.5
+PyAudio==0.2.11
+noisereduce==1.1.0
+appJar==0.94.0
+paho_mqtt==1.5.1
