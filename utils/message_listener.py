@@ -75,7 +75,7 @@ class MessageListener:
 
     # Save audio and return its filename
     def save_audio_msg(self):
-        filename = "Audio {}: {}.wav".format(self.message["first_packet_time"], self.message["id"])
+        filename = "Audio {}: {}".format(self.message["first_packet_time"], self.message["id"])
         wf = wave.open(filename, 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(pyaudio.get_sample_size(self.sample_format))
