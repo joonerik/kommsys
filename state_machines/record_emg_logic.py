@@ -60,7 +60,7 @@ class RecorderEmergency:
             
             data_dict = {"id": self.id, "first_packet_time": str(first_packet_time), "type": "data", "audio": audiochunks}
             
-            self.client.publish("team13/emg", json.dumps(data_dict))
+            self.client.publish("emg", json.dumps(data_dict))
 
         # Last packet
         data_dict = {"id": self.id, 
@@ -68,7 +68,7 @@ class RecorderEmergency:
                      "type" : "bye",
                      "audio": ""}
 
-        self.client.publish("team13/emg", json.dumps(data_dict))
+        self.client.publish("emg", json.dumps(data_dict))
         
         # Stop and close the stream
         stream.stop_stream()

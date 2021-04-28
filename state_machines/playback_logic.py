@@ -18,8 +18,8 @@ class Player:
         self.client.connect(broker, port)
         self.channel = open("audio_files/channel.txt", "r").readline()
         # TODO: We have to make sure that the on_message (callback?) for 'emg'-channel is prioritized
-        self.client.subscribe("team13/" + self.channel)
-        self.client.subscribe("team13/emg")
+        self.client.subscribe(self.channel)
+        self.client.subscribe("emg")
         self.filename = 'audio_files/output_audio/output.wav'
         self.emg_mode = False
         self.id = id 
@@ -50,7 +50,7 @@ class Player:
         # play_audio(self.current_user, data_id, msg)
         # TODO: use play_audio function instead, as the logic is similar
         # TODO: fix logic where emg is prioritized
-        if (str(msg.topic) == "team13/emg"):
+        if (str(msg.topic) == "emg"):
             self.current_user = data_id
             if (len(self.emergency) < 1):
                 self.emergency.append(self.current_user)
