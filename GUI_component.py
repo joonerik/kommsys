@@ -12,25 +12,6 @@ import socket
 from random import randint
 
 class GUI:
-
-    def count(self,t):
-        while t < 60:
-            mins, secs = divmod(t, 60)
-            timer = '{:02d}:{:02d}'.format(mins, secs)
-            print(timer, end="\r")
-            time.sleep(1)
-            t += 1
-            print(t)
-            self.update()
-            if self.playback.stm.state == "ready":
-                break
-
-    def update(self):
-        state = self.playback.stm.state
-        if state == "ready":
-            self.app.setImage("show", "img/idle2.png")
-            self.app.setImageMap("show", self.click, self.coords)
-
     def create_driver(self):
         self.id = socket.gethostname() + str(randint(0,100))
 
