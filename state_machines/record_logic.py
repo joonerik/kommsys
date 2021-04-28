@@ -67,7 +67,7 @@ class Recorder:
             data_dict = {"id": self.id, 
                          "first_packet_time": str(first_packet_time), 
                          "type" : "bye",
-                         "audio": "",}
+                         "audio": ""}
 
             self.client.publish(topic, json.dumps(data_dict))
             
@@ -84,9 +84,9 @@ class Recorder:
     def stop(self):
         self.recording = False
         time.sleep(0.1)
-        topic = open("audio_files/channel.txt", "r").readline()
-        data_dict = {"id": self.id, "time": str(datetime.now()), "type": "bye", "audio": ''}
-        self.client.publish(topic, json.dumps(data_dict))
+        # topic = open("audio_files/channel.txt", "r").readline()
+        # data_dict = {"id": self.id, "time": str(datetime.now()), "type": "bye", "audio": ''}
+        # self.client.publish(topic, json.dumps(data_dict))
         self.stm.stop_timer('t')
 
     def timeout(self):
