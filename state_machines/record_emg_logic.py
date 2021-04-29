@@ -77,7 +77,6 @@ class RecorderEmergency:
         self.stm.stop_timer('t')
 
     def timeout(self):
-        print("emg recording timed out")
         self.stop()
 
     def create_machine(self, name): 
