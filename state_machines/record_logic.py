@@ -95,7 +95,7 @@ class Recorder:
         t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
         t6 = {'trigger': 'emg_msg', 'source': 'recording', 'target': 'recording', 'effect': 'switch_emg_mode; stop'}
         
-        s_recording = {'name': 'recording', 'entry': 'start_timer("t", 30000); record'}
+        s_recording = {'name': 'recording', 'do' : 'record()', 'entry': 'start_timer("t", 30000); record'}
 
         stm = stmpy.Machine(name=name, transitions=[t0, t1, t3, t4, t5, t6], states=[s_recording], obj=self)
         self.stm = stm

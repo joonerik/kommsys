@@ -85,7 +85,7 @@ class RecorderEmergency:
         t2 = {'trigger': 'stop', 'source': 'recording', 'target': 'ready', 'effect': 'stop'}
         t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready', 'effect': 'timeout'}
         
-        s_recording = {'name': 'recording', 'entry': 'start_timer("t", 30000); record'}
+        s_recording = {'name': 'recording', 'do' : 'record()', 'entry': 'start_timer("t", 30000); record'}
 
         stm = stmpy.Machine(name=name, transitions=[t0, t1, t2, t4], states=[s_recording], obj=self)
         self.stm = stm
