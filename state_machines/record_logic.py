@@ -85,20 +85,20 @@ class Recorder:
         print("recording timed out")
         self.stop()
 
-    """def switch_emg_mode(self):
+    def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
-        print("Emergency mode switched to: " + str(self.emg_mode) + " in record_stm")"""
+        print("Emergency mode switched to: " + str(self.emg_mode) + " in record_stm")
          
     def create_machine(self, name): 
         t0 = {'source': 'initial', 'target': 'ready'}
         t1 = {'trigger': 'start', 'source': 'ready', 'target': 'recording'}
         t3 = {'trigger': 'stop', 'source': 'recording', 'target': 'ready', 'effect': 'stop'}
         t4 = {'trigger': 't', 'source': 'recording', 'target': 'ready', 'effect': 'timeout'}
-        #t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready'}
-        #t6 = {'trigger': 'emg_msg', 'source': 'recording', 'target': 'recording'}
+        t5 = {'trigger': 'emg_msg', 'source': 'ready', 'target': 'ready', 'effect': 'switch_emg_mode'}
+        t6 = {'trigger': 'emg_msg', 'source': 'recording', 'target': 'recording', 'effect': 'switch_emg_mode; stop'}
         
         s_recording = {'name': 'recording', 'do': 'record()', 'entry': 'start_timer("t", 30000)'}
 
-        stm = stmpy.Machine(name=name, transitions=[t0, t1, t3, t4], states=[s_recording], obj=self)
+        stm = stmpy.Machine(name=name, transitions=[t0, t1, t3, t4, t5, t6], states=[s_recording], obj=self)
         self.stm = stm
         return self.stm
