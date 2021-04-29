@@ -59,7 +59,7 @@ class Recorder:
                 
                 data_dict = {"id": self.id, "first_packet_time": str(first_packet_time), "type": "data", "audio": audiochunks}
                 
-                self.client.publish(topic, json.dumps(data_dict))
+                self.client.publish(topic, json.dumps(data_dict), qos=1, retain=True)
 
             # Last packet
             data_dict = {"id": self.id, 
@@ -67,7 +67,7 @@ class Recorder:
                          "type" : "bye",
                          "audio": ""}
 
-            self.client.publish(topic, json.dumps(data_dict))
+            self.client.publish(topic, json.dumps(data_dict), qos=1, retain=True)
             
             # Stop and close the stream
             stream.stop_stream()
