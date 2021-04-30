@@ -1,13 +1,13 @@
 # TTM4115 - Design av kommuniserende systemer 💥
 
-This is a semester project in the course TTM4115 - Design av kommuniserende systemer. It includes a system specification which documents the planned system. The system is introduced in the system specification. Our implementation is also covered here, especially in the "implementation comments" section.
+This is a semester project in the course TTM4115 - Design av kommuniserende systemer. It includes a system specification which documents the planned system. The system is introduced in the system specification. Our implementation is also covered here, especially in the _implementation comments_ section.
 
 
 ## How to run 🚀
 
-There are multiple libraries required to run the application. The requirements should be specified in the "requirements.txt", which should be possible to install by "pip". 
+There are multiple libraries required to run the application. The requirements should be specified in the _requirements.txt_, which should be possible to install by _pip_. 
 
-To run the application, run the Python file "GUI_component.py".
+To run the application, run the Python file _GUI_component.py_.
 
 
 ## Repository structure 🎨
@@ -19,12 +19,12 @@ To run the application, run the Python file "GUI_component.py".
 - [**utils**](/utils) files used for logging and noise reduction. The noise reduction is not currently in use.
 
 
-## User interface 💄
-
-![UI](https://gitlab.stud.idi.ntnu.no/sindsolh/team13_walkietalkie/-/tree/main/img/ui.png)
-
-
 ## System 📝
 
 The system is implemented using MQTT. A MQTT broker hosted by NTNU is used as the broker, in which our devices, i.e., multiple walkie-talkies, subscribe to a desired channel.  
+
+
+## User interface 💄
+
+![UI](/img/ui.png)
 
