@@ -1,7 +1,6 @@
 from threading import Thread
 from stmpy import Machine, Driver
 from os import system
-from utils.reduceNoise import reduce_noise
 import paho.mqtt.client as mqtt
 import os
 import pyaudio
