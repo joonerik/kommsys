@@ -20,24 +20,24 @@ class GUI:
 
     def recording(self):
         self.driver.send('start', 'recorder_stm')
-        self.isRecording = True
+        self.is_recording = True
         self.app.setImage("show", "img/recording.png")
         self.app.setImageMap("show", self.click, self.coords)
 
     def stop_recording(self):
         self.driver.send('stop', 'recorder_stm')
         self.app.setImage("show", "img/idle2.png")
-        self.isRecording = False
+        self.is_recording = False
         self.app.setImageMap("show", self.click, self.coords)
 
     def recording_emg(self):
-        if self.isRecording == True:
+        if self.is_recording == True:
             self.driver.send('stop', 'recorder_stm')
 
         self.driver.send('emg_msg', 'recorder_stm')
         self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('start', 'recorder_emg_stm')
-        self.emgMode = True
+        self.emg_mode = True
         self.app.setBg("red")
         self.app.setFg("red")
         self.app.setImage("show", "img/ssos.png")
@@ -47,7 +47,7 @@ class GUI:
         self.driver.send('emg_msg', 'recorder_stm')
         self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('stop', 'recorder_emg_stm')
-        self.emgMode = False
+        self.emg_mode = False
         self.app.setBg("mediumslateblue")
         self.app.setFg("Pink")
         self.app.setImage("show", "img/idle2.png")
@@ -61,9 +61,9 @@ class GUI:
     def __init__(self):
         self.app = gui()
         self.channel_number = open("audio_files/channel.txt", "r").readline()
-        self.channelEdit = False
-        self.isRecording = False
-        self.emgMode = False
+        self.channel_edit = False
+        self.is_recording = False
+        self.emg_mode = False
         self.app.setBg("mediumslateblue")
         self.app.setFg("pink")
         self.app.setExpand("NONE")
@@ -95,28 +95,28 @@ class GUI:
     def click(self, area):
         self.app.setLabel("l1", "Latest area clicked: " + area)
         if area == "SOS":
-            if not self.emgMode:
+            if not self.emg_mode:
                 self.recording_emg()
             else:
                 self.stop_recording_emg()
 
-        if area == "Record" and not self.emgMode:
-            if not self.isRecording:
+        if area == "Record" and not self.emg_mode:
+            if not self.is_recording:
                 self.recording()
             else:
                 self.stop_recording()
         
-        if area == "change channel" and not self.emgMode:
-            self.channelEdit = True
+        if area == "change channel" and not self.emg_mode:
+            self.channel_edit = True
         
         k = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         
-        if self.channelEdit:
+        if self.channel_edit:
             if area in k:
                 self.channel_number += area
             
             if area == "done":
-                self.channelEdit = False
+                self.channel_edit = False
                 if self.channel_number != "":
                     self.app.setLabel("channelnow", "Current channel: " + self.channel_number)
                     self.change_channel(self.channel_number)
