@@ -122,9 +122,10 @@ class GUI:
             
             if area == "done":
                 self.channelEdit = False
-                self.app.setLabel("channelnow", "Current channel: " + self.channel_number)
-                self.change_channel(self.channel_number)
-                self.channel_number = ""
+                if self.channel_number != "":
+                    self.app.setLabel("channelnow", "Current channel: " + self.channel_number)
+                    self.change_channel(self.channel_number)
+                    self.channel_number = ""
         self.app.go()
 
     def create_gui(self):
