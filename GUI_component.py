@@ -7,6 +7,39 @@ import socket
 from random import randint
 
 class GUI:
+    def __init__(self):
+        self.app = gui()
+        self.channel_number = open("audio_files/channel.txt", "r").readline()
+        self.channel_edit = False
+        self.is_recording = False
+        self.emg_mode = False
+        self.app.setBg("mediumslateblue")
+        self.app.setFg("pink")
+        self.app.setExpand("NONE")
+        self.coords = {
+            "Record": [76, 404, 188, 483],
+            "SOS": [79, 496, 178, 533],
+            "1": [83,565,138,594],
+            "2": [158, 565, 224, 594],
+            "3": [241, 565, 301, 594],
+            "4": [83, 609, 138, 637],
+            "5": [158, 609, 224, 637],
+            "6": [241, 609, 301, 637],
+            "7": [83, 652, 138, 684],
+            "8": [158, 652, 224, 684],
+            "9": [241, 652, 301, 684],
+            "0": [158, 702, 224, 726],
+            "change channel": [83, 702, 138, 726],
+            "done": [241, 702, 301, 726]
+        }
+
+        self.app.addImage("show", "img/idle.png", 0, 0)
+        self.app.setImageMap("show", self.click, self.coords)
+        self.app.addLabel("l1", "<click on the device>")
+        self.driver = stmpy.Driver()
+        self.driver.start(keep_active=True)
+        self.create_driver()
+        
     def create_driver(self):
         self.id = socket.gethostname() + str(randint(0,100))
         self.recorder = Recorder(self.id)
@@ -57,40 +90,6 @@ class GUI:
         newChannel = open("audio_files/channel.txt", "w")
         newChannel.write(channel)
         self.driver.send('change_channel_signal', 'playback_stm')
-
-    def __init__(self):
-        self.app = gui()
-        self.channel_number = open("audio_files/channel.txt", "r").readline()
-        self.channel_edit = False
-        self.is_recording = False
-        self.emg_mode = False
-        self.app.setBg("mediumslateblue")
-        self.app.setFg("pink")
-        self.app.setExpand("NONE")
-        self.coords = {
-            "Record": [76, 404, 188, 483],
-            "SOS": [79, 496, 178, 533],
-            "1": [83,565,138,594],
-            "2": [158, 565, 224, 594],
-            "3": [241, 565, 301, 594],
-            "4": [83, 609, 138, 637],
-            "5": [158, 609, 224, 637],
-            "6": [241, 609, 301, 637],
-            "7": [83, 652, 138, 684],
-            "8": [158, 652, 224, 684],
-            "9": [241, 652, 301, 684],
-            "0": [158, 702, 224, 726],
-            "change channel": [83, 702, 138, 726],
-            "done": [241, 702, 301, 726]
-        }
-
-        self.app.addImage("show", "img/idle.png", 0, 0)
-        self.app.setImageMap("show", self.click, self.coords)
-        self.app.addLabel("l1", "<click on the device>")
-        self.driver = stmpy.Driver()
-        self.driver.start(keep_active=True)
-        self.create_driver()
-
 
     def click(self, area):
         self.app.setLabel("l1", "Latest area clicked: " + area)
