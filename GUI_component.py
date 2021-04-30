@@ -20,14 +20,12 @@ class GUI:
 
     def recording(self):
         self.driver.send('start', 'recorder_stm')
-        print("Start recording")
         self.isRecording = True
         self.app.setImage("show", "img/recording.png")
         self.app.setImageMap("show", self.click, self.coords)
 
     def stop_recording(self):
         self.driver.send('stop', 'recorder_stm')
-        print("Stop recording")
         self.app.setImage("show", "img/idle2.png")
         self.isRecording = False
         self.app.setImageMap("show", self.click, self.coords)
@@ -39,7 +37,6 @@ class GUI:
         self.driver.send('emg_msg', 'recorder_stm')
         self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('start', 'recorder_emg_stm')
-        print("Start emergency recording")
         self.emgMode = True
         self.app.setBg("red")
         self.app.setFg("red")
@@ -50,7 +47,6 @@ class GUI:
         self.driver.send('emg_msg', 'recorder_stm')
         self.driver.send('emg_msg', 'playback_stm')
         self.driver.send('stop', 'recorder_emg_stm')
-        print("Stop recording emergency")
         self.emgMode = False
         self.app.setBg("mediumslateblue")
         self.app.setFg("Pink")
@@ -60,7 +56,6 @@ class GUI:
     def change_channel(self, channel):
         newChannel = open("audio_files/channel.txt", "w")
         newChannel.write(channel)
-        print("Change channel to: " + str(channel))
         self.driver.send('change_channel_signal', 'playback_stm')
 
     def __init__(self):

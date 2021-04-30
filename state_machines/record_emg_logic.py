@@ -27,7 +27,6 @@ class RecorderEmergency:
     def start(self, broker, port):
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
-        print("Connecting to {}:{}".format(broker, port))
         self.client.connect(broker, port)
         
         try:
