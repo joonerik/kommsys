@@ -21,7 +21,6 @@ class MessageListener:
         self.broker = "mqtt.item.ntnu.no"
         self.port = 1883
         self.topic = topic
-        self.setup_mqtt()
 
         # Audio
         self.channels = 1
@@ -39,7 +38,8 @@ class MessageListener:
         # Currently received message
         self.message = {}
 
-            
+        # Start MQTT
+        self.setup_mqtt()
 
     def setup_logging(self):
         logging.basicConfig(format='%(asctime)s %(message)s',
