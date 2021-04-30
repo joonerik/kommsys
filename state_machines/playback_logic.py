@@ -79,21 +79,6 @@ class Player:
                         print("ValueError raised!")
                         pass 
     
-    def play_audio(self, current_user, data_id, msg):
-        if ((json.loads(msg.payload))["type"] == "bye"):
-                self.current_user == None
-        elif (str(self.id) != str(data_id) and self.current_user == data_id):
-            if not self.emg_mode:
-                try:
-                    data = json.loads(msg.payload)
-                    audiochunks = data["audio"]
-                    for i in range(10):
-                        self.player.write(bytes.fromhex(audiochunks[i]), 256)
-                except ValueError:
-                    print("ValueError raised!")
-                    pass
-
-        
     def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
 
