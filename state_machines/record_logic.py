@@ -82,12 +82,10 @@ class Recorder:
         self.stm.stop_timer('t')
 
     def timeout(self):
-        print("recording timed out")
         self.stop()
 
     def switch_emg_mode(self):
         self.emg_mode = not self.emg_mode
-        print("Emergency mode switched to: " + str(self.emg_mode) + " in record_stm")
          
     def create_machine(self, name): 
         t0 = {'source': 'initial', 'target': 'ready'}
